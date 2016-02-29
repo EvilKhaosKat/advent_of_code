@@ -9,5 +9,5 @@ for position, char in enumerate(input):
         result -= 1
 
     if result == -1:  # in basement
-        print "position of first basement:" + str(position+1)
+        print("position of first basement:" + str(position+1))
         break
