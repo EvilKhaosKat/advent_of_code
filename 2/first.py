@@ -18,7 +18,6 @@ def get_surface_area(l, w, h):
 
 total = 0
 with open("input.txt") as f:
-    for gift in f.readlines():
-        total += calculate_paper(gift)
+    total = sum(calculate_paper(gift) for gift in f.readlines())
 
 print(total)
