@@ -33,4 +33,4 @@ def is_string_nice(string):
 with open("input.txt") as f:
     nice_strings = sum(1 if is_string_nice(string) else 0 for string in f.readlines())
 
-print("print_strings:{0}".format(nice_strings))
+print("nice_strings:{0}".format(nice_strings))
