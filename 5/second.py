@@ -1,35 +1,39 @@
-def is_at_least_three_vowels(string):
-    vowels_count = 0
+# first check
+def contains_repeated_pairs(string):
+    """
+    It contains a pair of any two letters that appears at least twice in the string without overlapping,
+    like xyxy (xy) or aabcdefgaa (aa), but not like aaa (aa, but it overlaps).
+    """
+    import re
 
-    for char in string:
-        if char in "aeiou":
-            vowels_count += 1
-
-    return vowels_count >= 3
+    return bool(re.search(r"(..).*\1", string))
 
 
-def is_contains_twice_in_row(string):
-    for position in range(len(string)-1):
-        if string[position] == string[position+1]:
+# second check
+def contains_repeated_letter(string):
+    """
+    It contains at least one letter which repeats with exactly one letter between them,
+    like xyx, abcdefeghi (efe), or even aaa.
+    """
+
+    for letter_number in range(0, len(string) - 2):
+        first_letter = string[letter_number]
+        third_letter = string[letter_number + 2]
+
+        if first_letter == third_letter:
             return True
 
     return False
 
 
-def is_no_prohibited_strings(string):
-    if "ab" not in string and "cd" not in string and "pq" not in string and "xy" not in string:
-        return True
-    else:
-        return False
-
-
 def is_string_nice(string):
-    if is_at_least_three_vowels(string) and is_contains_twice_in_row(string) and is_no_prohibited_strings(string):
+    if contains_repeated_pairs(string) and contains_repeated_letter(string):
         return True
     else:
         return False
 
 
+# main logic
 with open("input.txt") as f:
     nice_strings = sum(1 if is_string_nice(string) else 0 for string in f.readlines())
 
