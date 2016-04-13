@@ -27,10 +27,7 @@ def contains_repeated_letter(string):
 
 
 def is_string_nice(string):
-    if contains_repeated_pairs(string) and contains_repeated_letter(string):
-        return True
-    else:
-        return False
+    return contains_repeated_pairs(string) and contains_repeated_letter(string)
 
 
 # main logic
