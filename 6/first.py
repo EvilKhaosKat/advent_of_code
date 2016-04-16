@@ -4,7 +4,6 @@ class Command:
     TURN_OFF = "turn off"
     TURN_ON = "turn on"
     TOGGLE = "toggle"
-    THROUGH = "through"
 
     type = None
     from_coord = ()
@@ -23,8 +22,6 @@ class Command:
             return cls.TURN_ON
         elif command_string.startswith(cls.TOGGLE):
             return cls.TOGGLE
-        elif command_string.startswith(cls.THROUGH):
-            return cls.THROUGH
         else:
             raise ValueError("Command '{0}' - command type cannot be recognised".format(command_string))
 
