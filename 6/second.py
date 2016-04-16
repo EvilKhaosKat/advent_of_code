@@ -135,8 +135,8 @@ commands = get_commands()
 execute_commands()
 
 all_lights = list(itertools.chain.from_iterable(lights_map))
-lit_lights_count = sum(all_lights)
-print("lit_lights_brightness:{0}".format(lit_lights_count))
+lit_lights_brightness = sum(all_lights)
+print("lit_lights_brightness:{0}".format(lit_lights_brightness))
 
 
 class TestCommand(unittest.TestCase):
