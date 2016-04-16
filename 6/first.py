@@ -1,13 +1,12 @@
 import unittest
+import itertools
 
 
-# commands
 class Command:
     TURN_OFF = "turn off"
     TURN_ON = "turn on"
     TOGGLE = "toggle"
 
-    type = None
     from_coord = ()
     to_coord = ()
 
@@ -16,33 +15,49 @@ class Command:
         self.from_coord = from_coord
         self.to_coord = to_coord
 
-    def execute(self, lights_map):
+    def execute(self, light_object):
+        """
+        command to be executed for separate light_object, one-by-one
+        currently - light object is a number, 0 or 1, represents state of light
+
+        :return new light_object value
+        """
         pass
+
+    def __repr__(self, *args, **kwargs):
+        return "({0}: from_coord:{1}; to_coord:{2})".format(self.__class__.__name__, self.from_coord, self.to_coord)
 
 
 class TurnOffCommand(Command):
-    pass
+    def execute(self, light_object):
+        super().execute(light_object)
+        return 0
 
 
 class TurnOnCommand(Command):
-    pass
+    def execute(self, light_object):
+        super().execute(light_object)
+
+        return 1
 
 
 class ToggleCommand(Command):
-    pass
-# commands ended
+    def execute(self, light_object):
+        super().execute(light_object)
+
+        return 1 - light_object
 
 
 class CommandFactory:
     # turn on 489,959 through 759,964
     @classmethod
     def get_command(cls, command_string):
-        from_coord, to_coord = cls.get_coords(command_string)
+        from_coord, to_coord = cls._get_coords(command_string)
 
-        return cls.create_command(command_string, from_coord, to_coord)
+        return cls._create_command(command_string, from_coord, to_coord)
 
     @staticmethod
-    def create_command(command_string, from_coord, to_coord):
+    def _create_command(command_string, from_coord, to_coord):
         if command_string.startswith(Command.TURN_OFF):
             return TurnOffCommand(from_coord, to_coord)
         elif command_string.startswith(Command.TURN_ON):
@@ -53,7 +68,7 @@ class CommandFactory:
             raise ValueError("Command '{0}' - command type cannot be recognised".format(command_string))
 
     @classmethod
-    def get_coords(cls, command_string):
+    def _get_coords(cls, command_string):
         """
         calculates coordinates from input command string, returns tuple of coordinates - (from, to)
         """
@@ -79,13 +94,46 @@ class CommandFactory:
         """
         return tuple(map(int, coords_strings_tuple))
 
-################################################################################
-# main logic
-# array = [[0] * 1000] * 1000
+
+def execute_command(command, lights_map):
+    from_coord = command.from_coord
+    to_coord = command.to_coord
+
+    for x in range(from_coord[0], to_coord[0] + 1):
+        for y in range(from_coord[1], to_coord[1] + 1):
+            lights_map[x][y] = command.execute(lights_map[x][y])
 
 
-###############################################################################
-# Tests
+def get_commands():
+    commands = []
+
+    with open("input.txt") as f:
+        for command_string in f.readlines():
+            commands.append(CommandFactory.get_command(command_string))
+
+    return commands
+
+
+def execute_commands():
+    for command in commands:
+        execute_command(command, lights_map)
+
+
+def create_lights_map(map_size):
+    return [[0] * map_size for i in range(map_size)]
+
+
+map_size = 1000
+lights_map = create_lights_map(map_size)
+
+commands = get_commands()
+execute_commands()
+
+all_lights = list(itertools.chain.from_iterable(lights_map))
+lit_lights_count = sum(all_lights)
+print("lit_lights_count:{0}".format(lit_lights_count))
+
+
 class TestCommand(unittest.TestCase):
     def test_command_type(self):
         command = CommandFactory.get_command("turn on 489,959 through 759,964")
@@ -93,7 +141,3 @@ class TestCommand(unittest.TestCase):
         self.assertTrue(isinstance(command, TurnOnCommand))
         self.assertEqual(command.from_coord, (489, 959))
         self.assertEqual(command.to_coord, (759, 964))
-
-
-if __name__ == '__main__':
-    unittest.main()
