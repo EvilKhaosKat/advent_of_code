@@ -18,7 +18,7 @@ class Command:
     def execute(self, light_object):
         """
         command to be executed for separate light_object, one-by-one
-        currently - light object is a number, 0 or 1, represents state of light
+        currently - light object is a number, 0 or 1, represents brightness of light
 
         :return new light_object value
         """
