@@ -74,28 +74,28 @@ class CommandFactory:
         """
         command_parts = command_string.split(' ')
 
-        to_coords = cls.parse_coords(command_parts[-1])
-        from_coords = cls.parse_coords(command_parts[-3])
+        to_coords = cls._parse_coords(command_parts[-1])
+        from_coords = cls._parse_coords(command_parts[-3])
 
         return tuple(from_coords), tuple(to_coords)
 
     @classmethod
-    def parse_coords(cls, coords_string):
+    def _parse_coords(cls, coords_string):
         """
         transforms "1,2" into ('1', '2')
         """
         coords_list = coords_string.split(",")
-        return cls.convert_to_int(coords_list)
+        return cls._convert_to_int(coords_list)
 
     @classmethod
-    def convert_to_int(cls, coords_strings_tuple):
+    def _convert_to_int(cls, coords_strings_tuple):
         """
         transforms ('1', '2') into (1, 2)
         """
         return tuple(map(int, coords_strings_tuple))
 
 
-def execute_command(command, lights_map):
+def _execute_command(command, lights_map):
     from_coord = command.from_coord
     to_coord = command.to_coord
 
@@ -121,7 +121,7 @@ def get_commands():
 
 def execute_commands():
     for command in commands:
-        execute_command(command, lights_map)
+        _execute_command(command, lights_map)
 
 
 def create_lights_map(map_size):
@@ -134,7 +134,7 @@ lights_map = create_lights_map(map_size)
 commands = get_commands()
 execute_commands()
 
-all_lights = list(itertools.chain.from_iterable(lights_map))
+all_lights = list(itertools.chain.from_iterable(lights_map)) # flatten list/map of lights
 lit_lights_brightness = sum(all_lights)
 print("lit_lights_brightness:{0}".format(lit_lights_brightness))
 
