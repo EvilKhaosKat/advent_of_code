@@ -1,0 +1,3 @@
+class Wire:
+    name = ""
+    connectors = []
