@@ -5,6 +5,12 @@ from AdventOfCodeHelper import get_input_lines
 
 
 class Circuit:
+    """
+    Core idea - created object view on 'circuit' - as collection of 'wires', connected by 'gates'.
+    Wire knows its gates, especially 'value gate', the gate that defines wires value.
+    Gate knows its input wires (or sometimes some constant value).
+    Each type of gates holds logic how exactly value to be calculated, knowing of gates (or theirs names) is enough.
+    """
     wires = {}
 
     def read_circuit(self):

@@ -78,7 +78,7 @@ class AndGate(Gate):
 
     def calculate_value(self):
         second_wire = self.circuit.get_wire_by_name(self.second_input)
-
+        # TODO supports 1 special case - 'Digit AND Wire' - to be updated to support all variants, for all wires types
         if self.first_input.isdigit():
             return int(self.first_input) & second_wire.get_value()
         else:
