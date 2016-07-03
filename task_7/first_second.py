@@ -43,6 +43,10 @@ class Circuit:
     def add_wire(self, wire):
         self.wires[wire.name] = wire
 
+    def reset_wires_values(self):
+        for wire in self.wires.values():
+            wire.value = None
+
     def __str__(self, *args, **kwargs):
         return "Circuit(wires:" + str(self.wires) + ")"
 
@@ -58,4 +62,10 @@ print("wire_lw:" + str(wire_lw))
 wire_a = circuit.wires["a"]
 
 a_value = wire_a.get_value()
-print("a_value:" + str(a_value))
+print("first a value:" + str(a_value))
+
+circuit.reset_wires_values()
+circuit.wires["b"].value = a_value
+
+a_value = wire_a.get_value()
+print("second a value:" + str(a_value))
