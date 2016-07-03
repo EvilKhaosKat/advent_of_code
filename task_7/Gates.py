@@ -1,3 +1,4 @@
+# TODO huge amount of similar code to be removed
 class Gate:
     circuit = None
     output_wire = None
