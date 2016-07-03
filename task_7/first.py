@@ -9,21 +9,21 @@ class Circuit:
 
     def read_circuit(self):
         for line in get_input_lines():
-            self._parse_line(line)
+            self._parse_line(line.strip())
 
     def _parse_line(self, line):
         if "AND" in line:
-            self._add_and_gate(line)
+            AndGate.create_gate(self, line)
         elif "OR" in line:
-            pass
+            OrGate.create_gate(self, line)
         elif "NOT" in line:
-            pass
+            NotGate.create_gate(self, line)
         elif "LSHIFT" in line:
-            pass
+            LshiftGate.create_gate(self, line)
         elif "RSHIFT" in line:
-            pass
+            RshiftGate.create_gate(self, line)
         else:  # raw value to the gate situation
-            pass
+            RawValueGate.create_gate(self, line)
 
     def get_wire_by_name(self, name):
         wire = self.wires.get(name)
@@ -37,15 +37,10 @@ class Circuit:
     def add_wire(self, wire):
         self.wires[wire.name] = wire
 
-    def _add_and_gate(self, line):
-        """
-        '1 AND ht -> hu'
-
-        :return: None
-        """
-
-        and_gate = AndGate.create_gate(self, line)
+    def __str__(self, *args, **kwargs):
+        return "Circuit(wires:" + str(self.wires) + ")"
 
 
 circuit = Circuit()
 circuit.read_circuit()
+print("circuit:" + str(circuit))
