@@ -55,10 +55,6 @@ circuit = Circuit()
 circuit.read_circuit()
 print("circuit:" + str(circuit))
 
-wire_lw = circuit.wires["lw"]
-print("wire_lw:" + str(wire_lw))
-
-
 wire_a = circuit.wires["a"]
 
 a_value = wire_a.get_value()

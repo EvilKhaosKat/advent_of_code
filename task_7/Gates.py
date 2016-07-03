@@ -94,8 +94,8 @@ class OrGate(Gate):
         input_output_raw = line.split(" -> ")
 
         input_wires_str = input_output_raw[0].split(" OR ")
-        self.first_input = self.get_wire_by_name(input_wires_str[0])
-        self.second_input = self.get_wire_by_name(input_wires_str[1])
+        self.first_input = input_wires_str[0]  # self.get_wire_by_name(input_wires_str[0])
+        self.second_input = input_wires_str[1]  # self.get_wire_by_name(input_wires_str[1])
 
         self.output_wire = self.get_wire_by_name(input_output_raw[-1])
         self.output_wire.value_gate = self
@@ -106,8 +106,8 @@ class OrGate(Gate):
         return OrGate(circuit)
 
     def calculate_value(self):
-        first_wire = self.circuit.get_wire_by_name(self.first_input.name)
-        second_wire = self.circuit.get_wire_by_name(self.second_input.name)
+        first_wire = self.circuit.get_wire_by_name(self.first_input)
+        second_wire = self.circuit.get_wire_by_name(self.second_input)
 
         return first_wire.get_value() | second_wire.get_value()
 
