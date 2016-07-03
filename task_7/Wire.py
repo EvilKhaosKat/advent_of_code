@@ -1,3 +1,0 @@
-class Wire:
-    name = ""
-    connectors = []
