@@ -26,6 +26,12 @@ class Circuit:
             RawValueGate.create_gate(self, line)
 
     def get_wire_by_name(self, name):
+        if not isinstance(name, str):
+            raise RuntimeError("Attempt to get wire not by string name:" + str(name))
+
+        if name.isdigit():
+            raise RuntimeError("Attempt to get wire by number name: " + str(name))
+
         wire = self.wires.get(name)
 
         if not wire:
@@ -44,3 +50,12 @@ class Circuit:
 circuit = Circuit()
 circuit.read_circuit()
 print("circuit:" + str(circuit))
+
+wire_lw = circuit.wires["lw"]
+print("wire_lw:" + str(wire_lw))
+
+
+wire_a = circuit.wires["a"]
+
+a_value = wire_a.get_value()
+print("a_value:" + str(a_value))
