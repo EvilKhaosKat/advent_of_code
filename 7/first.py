@@ -20,6 +20,7 @@ class Circuit:
         elif "RSHIFT" in line:
             pass
         else:  # raw value to the gate situation
+            pass
 
 
 circuit = Circuit()
