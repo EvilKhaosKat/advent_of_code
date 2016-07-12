@@ -12,7 +12,7 @@ func main() {
 	file, err := ioutil.ReadFile("../input.txt")
 	if err != nil {
 		fmt.Println(err)
-		return
+		os.Exit(1)
 	}
 
 	content := string(file)
