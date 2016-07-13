@@ -10,11 +10,11 @@ func main() {
 	PrintCurrentDir()
 
 	file, err := ioutil.ReadFile("../input.txt")
+        defer file.Close()
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-        defer file.Close()
 
 	content := string(file)
 	fmt.Println(content)
