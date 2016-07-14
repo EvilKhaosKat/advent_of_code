@@ -1,22 +1,26 @@
 package main
 
 import "fmt"
-import "io/ioutil"
 import "os"
+import "bufio"
 
 func main() {
 	fmt.Println("Advent of code: Golang\nTask 8")
 
 	PrintCurrentDir()
 
-	file, err := ioutil.ReadFile("../input.txt")
+	file, err := os.Open("../input.txt")
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("Error opening input file:", err)
 		os.Exit(1)
 	}
+	defer file.Close()
 
-	content := string(file)
-	fmt.Println(content)
+	scanner := bufio.NewScanner(file)
+
+	for scanner.Scan() {
+		fmt.Println(scanner.Text())
+	}
 }
 
 func PrintCurrentDir() {
