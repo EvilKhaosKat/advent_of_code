@@ -37,7 +37,7 @@ func handleFile(file io.Reader) {
 		go handleString(scanner.Text(), resultChan)
 		linesCount++
 	}
-	fmt.Println("linesCount: ", linesCount)
+	fmt.Println("linesCount:", linesCount)
 
 	for i := 0; i < linesCount; i++ {
 		fmt.Printf("read from results: %+v\n", <-resultChan)
