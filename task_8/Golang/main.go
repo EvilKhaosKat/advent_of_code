@@ -1,8 +1,11 @@
 package main
 
-import "fmt"
-import "os"
-import "bufio"
+import (
+	"bufio"
+	"io"
+	"os"
+	"fmt"
+)
 
 func main() {
 	fmt.Println("Advent of code: Golang\nTask 8")
@@ -16,6 +19,10 @@ func main() {
 	}
 	defer file.Close()
 
+	handleFile(file)
+}
+
+func handleFile(file io.Reader) {
 	scanner := bufio.NewScanner(file)
 
 	for scanner.Scan() {
@@ -31,4 +38,3 @@ func PrintCurrentDir() {
 	}
 	fmt.Println("current dir: " + pwd)
 }
-
