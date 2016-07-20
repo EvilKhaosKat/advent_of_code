@@ -7,6 +7,11 @@ import (
 	"fmt"
 )
 
+type analyseResult struct {
+	charsOfCode  int
+	charsOfValue int
+}
+
 func main() {
 	fmt.Println("Advent of code: Golang\nTask 8")
 
@@ -20,14 +25,29 @@ func main() {
 	defer file.Close()
 
 	handleFile(file)
+	file.Stat()
 }
 
 func handleFile(file io.Reader) {
+	resultChan := make(chan analyseResult)
+
+	linesCount := 0
 	scanner := bufio.NewScanner(file)
 
 	for scanner.Scan() {
-		fmt.Println(scanner.Text())
+		go handleString(scanner.Text(), resultChan)
+		linesCount++
 	}
+	fmt.Println("linesCount: ", linesCount)
+
+	for i := 0; i < linesCount; i++ {
+		fmt.Printf("read from results: %+v\n", <-resultChan)
+	}
+}
+
+func handleString(inputString string, resultChan chan analyseResult) {
+	//fmt.Println("handleString:" + inputString)
+	resultChan <- analyseResult{charsOfCode: 1, charsOfValue: 1}
 }
 
 func PrintCurrentDir() {
