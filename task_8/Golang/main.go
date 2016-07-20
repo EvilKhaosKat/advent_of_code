@@ -25,7 +25,6 @@ func main() {
 	defer file.Close()
 
 	handleFile(file)
-	file.Stat()
 }
 
 func handleFile(file io.Reader) {
