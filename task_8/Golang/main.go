@@ -88,9 +88,9 @@ func handleString(inputString string, resultChan chan AnalyseResult) {
 			previousState.id = EscapeFirst
 		} else if previousState.id == EscapeFirst {
 			previousState.id = EscapeSecond
+			charsOfValue++
 		} else if previousState.id == EscapeSecond {
 			previousState.id = NormalChar
-			charsOfValue++
 		} else if previousState.id == NormalChar {
 			if char == '\\' {
 				previousState.id = Escape
