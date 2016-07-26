@@ -16,11 +16,13 @@ func checkString(inputString string, charsOfCode int, charsOfValue int, t *testi
 	resultChan := make(chan AnalyseResult, 1)
 
 	handleString(inputString, resultChan)
-	emptyResult := <- resultChan
+	emptyResult := <-resultChan
 
 	if emptyResult.charsOfCode != charsOfCode {
-		t.Error(fmt.Sprintf("charsOfCode equals %d, but must be %d", emptyResult.charsOfCode, charsOfCode))
+		t.Fatal(fmt.Sprintf("Fail for %s, charsOfCode equals %d, but must be %d",
+			emptyResult.inputString, emptyResult.charsOfCode, charsOfCode))
 	} else if emptyResult.charsOfValue != charsOfValue {
-		t.Error(fmt.Sprintf("charsOfValue equals %d, but must be %d", emptyResult.charsOfValue, charsOfValue))
+		t.Fatal(fmt.Sprintf("Fail for %s, charsOfValue equals %d, but must be %d",
+			emptyResult.inputString, emptyResult.charsOfValue, charsOfValue))
 	}
 }

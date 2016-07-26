@@ -20,7 +20,7 @@ const (
 type AnalyseResult struct {
 	charsOfCode  int
 	charsOfValue int
-	inputString string
+	inputString  string
 }
 
 type State struct {
@@ -67,11 +67,11 @@ func handleFile(file io.Reader) {
 	fmt.Println("totalCharsOfCode:", totalCharsOfCode)
 	fmt.Println("totalCharsOfValue:", totalCharsOfValue)
 
-	fmt.Println("result:", totalCharsOfCode - totalCharsOfValue) //1391 - too high
+	fmt.Println("result:", totalCharsOfCode - totalCharsOfValue)
 }
 
 func handleString(inputString string, resultChan chan AnalyseResult) {
-	previousState := State{id:NormalChar}
+	state := State{id:NormalChar}
 
 	inputStringLen := utf8.RuneCountInString(inputString)
 	charsOfValue := 0
@@ -85,32 +85,43 @@ func handleString(inputString string, resultChan chan AnalyseResult) {
 	workingString := inputString[1:inputStringLen - 1] //ignore quotes
 
 	for _, char := range workingString {
-		if previousState.id == Escape {
-			if char == 'x' {
-				//char code sequence starting
-				previousState.id = EscapeX
-			} else {
-				//just escaped char
-				charsOfValue++
-			}
-		} else if previousState.id == EscapeX {
-			previousState.id = EscapeFirst
-		} else if previousState.id == EscapeFirst {
-			previousState.id = EscapeSecond
+		updateState(&state, char)
+
+		if state.id == NormalChar || state.id == EscapeSecond {
 			charsOfValue++
-		} else if previousState.id == EscapeSecond {
-			previousState.id = NormalChar
-		} else if previousState.id == NormalChar {
-			if char == '\\' {
-				previousState.id = Escape
-			} else {
-				//just normal char
-				charsOfValue++
-			}
 		}
 	}
 
-	resultChan <- AnalyseResult{charsOfCode:inputStringLen, charsOfValue:charsOfValue,  inputString:inputString}
+	resultChan <- AnalyseResult{charsOfCode:inputStringLen, charsOfValue:charsOfValue, inputString:inputString}
+}
+func updateState(oldState *State, char rune) {
+	if oldState.id == NormalChar && char != '\\' {
+		return
+	}
+
+	if oldState.id == Escape {
+		if char == 'x' {
+			//char code sequence starting
+			oldState.id = EscapeX
+		} else {
+			//just escaped char
+			oldState.id = NormalChar
+		}
+	} else if oldState.id == EscapeX {
+		oldState.id = EscapeFirst
+	} else if oldState.id == EscapeFirst {
+		oldState.id = EscapeSecond
+	} else if oldState.id == EscapeSecond {
+		if char == '\\' {
+			oldState.id = Escape
+		} else {
+			oldState.id = NormalChar
+		}
+	} else if oldState.id == NormalChar {
+		if char == '\\' {
+			oldState.id = Escape
+		}
+	}
 }
 
 func PrintCurrentDir() {
