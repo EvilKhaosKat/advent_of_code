@@ -5,11 +5,25 @@ import (
 	"io"
 	"os"
 	"fmt"
+	"unicode/utf8"
 )
 
-type analyseResult struct {
+//TODO fsm transitions to be declared here somehow
+const (
+	NormalChar = iota
+	Escape
+	EscapeX
+	EscapeFirst
+	EscapeSecond
+)
+
+type AnalyseResult struct {
 	charsOfCode  int
 	charsOfValue int
+}
+
+type State struct {
+	id int
 }
 
 func main() {
@@ -28,7 +42,7 @@ func main() {
 }
 
 func handleFile(file io.Reader) {
-	resultChan := make(chan analyseResult)
+	resultChan := make(chan AnalyseResult)
 
 	linesCount := 0
 	scanner := bufio.NewScanner(file)
@@ -44,9 +58,50 @@ func handleFile(file io.Reader) {
 	}
 }
 
-func handleString(inputString string, resultChan chan analyseResult) {
-	//fmt.Println("handleString:" + inputString)
-	resultChan <- analyseResult{charsOfCode: 1, charsOfValue: 1}
+func handleString(inputString string, resultChan chan AnalyseResult) {
+	previousState := State{id:NormalChar}
+
+	inputStringLen := utf8.RuneCountInString(inputString)
+	charsOfValue := 0
+
+	//fmt.Println("inputString:", inputString)
+	//fmt.Println("inputStringLen:", inputStringLen)
+
+	if inputStringLen == 2 {
+		//empty string passed
+		resultChan <- AnalyseResult{charsOfCode:2, charsOfValue:0}
+		return
+	}
+
+	workingString := inputString[1:inputStringLen - 1] //ignore quotes
+
+	for _, char := range workingString {
+		if previousState.id == Escape {
+			if char == 'x' {
+				//char code sequence starting
+				previousState.id = EscapeX
+			} else {
+				//just escaped char
+				charsOfValue++
+			}
+		} else if previousState.id == EscapeX {
+			previousState.id = EscapeFirst
+		} else if previousState.id == EscapeFirst {
+			previousState.id = EscapeSecond
+		} else if previousState.id == EscapeSecond {
+			previousState.id = NormalChar
+			charsOfValue++
+		} else if previousState.id == NormalChar {
+			if char == '\\' {
+				previousState.id = Escape
+			} else {
+				//just normal char
+				charsOfValue++
+			}
+		}
+	}
+
+	resultChan <- AnalyseResult{charsOfCode:inputStringLen, charsOfValue:charsOfValue}
 }
 
 func PrintCurrentDir() {
