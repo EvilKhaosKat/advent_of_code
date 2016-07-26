@@ -20,6 +20,7 @@ const (
 type AnalyseResult struct {
 	charsOfCode  int
 	charsOfValue int
+	inputString string
 }
 
 type State struct {
@@ -53,9 +54,20 @@ func handleFile(file io.Reader) {
 	}
 	fmt.Println("linesCount:", linesCount)
 
+	totalCharsOfCode := 0
+	totalCharsOfValue := 0
 	for i := 0; i < linesCount; i++ {
-		fmt.Printf("read from results: %+v\n", <-resultChan)
+		result := <-resultChan
+		fmt.Printf("read from results: %+v\n", result)
+
+		totalCharsOfCode += result.charsOfCode
+		totalCharsOfValue += result.charsOfValue
 	}
+
+	fmt.Println("totalCharsOfCode:", totalCharsOfCode)
+	fmt.Println("totalCharsOfValue:", totalCharsOfValue)
+
+	fmt.Println("result:", totalCharsOfCode - totalCharsOfValue) //1391 - too high
 }
 
 func handleString(inputString string, resultChan chan AnalyseResult) {
@@ -64,12 +76,9 @@ func handleString(inputString string, resultChan chan AnalyseResult) {
 	inputStringLen := utf8.RuneCountInString(inputString)
 	charsOfValue := 0
 
-	//fmt.Println("inputString:", inputString)
-	//fmt.Println("inputStringLen:", inputStringLen)
-
 	if inputStringLen == 2 {
 		//empty string passed
-		resultChan <- AnalyseResult{charsOfCode:2, charsOfValue:0}
+		resultChan <- AnalyseResult{charsOfCode:2, charsOfValue:0, inputString:inputString}
 		return
 	}
 
@@ -101,7 +110,7 @@ func handleString(inputString string, resultChan chan AnalyseResult) {
 		}
 	}
 
-	resultChan <- AnalyseResult{charsOfCode:inputStringLen, charsOfValue:charsOfValue}
+	resultChan <- AnalyseResult{charsOfCode:inputStringLen, charsOfValue:charsOfValue,  inputString:inputString}
 }
 
 func PrintCurrentDir() {
