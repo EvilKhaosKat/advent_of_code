@@ -5,24 +5,27 @@ import (
 	"fmt"
 )
 
-func TestHandleString(t *testing.T) {
-	checkString("\"\"", 2, 0, t)
-	checkString("\"abc\"", 5, 3, t)
-	checkString("\"aaa\\\"aaa\"", 10, 7, t)
-	checkString("\"\\x27\"", 6, 1, t)
+func TestStringDecoding(t *testing.T) {
+	checkString("\"\"", 2, 0, 6, t)
+	checkString("\"abc\"", 5, 3, 9, t)
+	checkString("\"aaa\\\"aaa\"", 10, 7, 16, t)
+	checkString("\"\\x27\"", 6, 1, 11, t)
 }
 
-func checkString(inputString string, charsOfCode int, charsOfValue int, t *testing.T) {
+func checkString(inputString string, charsOfCode int, charsOfValue int, totalEncodedChars int, t *testing.T) {
 	resultChan := make(chan AnalyseResult, 1)
 
 	handleString(inputString, resultChan)
-	emptyResult := <-resultChan
+	result := <-resultChan
 
-	if emptyResult.charsOfCode != charsOfCode {
+	if result.charsOfCode != charsOfCode {
 		t.Fatal(fmt.Sprintf("Fail for %s, charsOfCode equals %d, but must be %d",
-			emptyResult.inputString, emptyResult.charsOfCode, charsOfCode))
-	} else if emptyResult.charsOfValue != charsOfValue {
+			result.inputString, result.charsOfCode, charsOfCode))
+	} else if result.charsOfValue != charsOfValue {
 		t.Fatal(fmt.Sprintf("Fail for %s, charsOfValue equals %d, but must be %d",
-			emptyResult.inputString, emptyResult.charsOfValue, charsOfValue))
+			result.inputString, result.charsOfValue, charsOfValue))
+	} else if result.totalEncodedChars != totalEncodedChars {
+		t.Fatal(fmt.Sprintf("Fail for %s, totalEncodedChars equals %d, but must be %d",
+			result.inputString, result.totalEncodedChars, totalEncodedChars))
 	}
 }

@@ -6,6 +6,7 @@ import (
 	"os"
 	"fmt"
 	"unicode/utf8"
+	"strings"
 )
 
 //TODO fsm transitions to be declared here somehow
@@ -18,9 +19,10 @@ const (
 )
 
 type AnalyseResult struct {
-	charsOfCode  int
-	charsOfValue int
-	inputString  string
+	charsOfCode       int
+	charsOfValue      int
+	inputString       string
+	totalEncodedChars int
 }
 
 type State struct {
@@ -56,18 +58,21 @@ func handleFile(file io.Reader) {
 
 	totalCharsOfCode := 0
 	totalCharsOfValue := 0
+	totalEncodedChars := 0
 	for i := 0; i < linesCount; i++ {
 		result := <-resultChan
 		fmt.Printf("read from results: %+v\n", result)
 
 		totalCharsOfCode += result.charsOfCode
 		totalCharsOfValue += result.charsOfValue
+		totalEncodedChars += result.totalEncodedChars
 	}
 
 	fmt.Println("totalCharsOfCode:", totalCharsOfCode)
 	fmt.Println("totalCharsOfValue:", totalCharsOfValue)
 
-	fmt.Println("result:", totalCharsOfCode - totalCharsOfValue)
+	fmt.Println("encodedResult:", totalCharsOfCode - totalCharsOfValue)
+	fmt.Println("escapedResult:", totalEncodedChars - totalCharsOfCode)
 }
 
 func handleString(inputString string, resultChan chan AnalyseResult) {
@@ -78,7 +83,7 @@ func handleString(inputString string, resultChan chan AnalyseResult) {
 
 	if inputStringLen == 2 {
 		//empty string passed
-		resultChan <- AnalyseResult{charsOfCode:2, charsOfValue:0, inputString:inputString}
+		resultChan <- AnalyseResult{charsOfCode:2, charsOfValue:0, inputString:inputString, totalEncodedChars:6}
 		return
 	}
 
@@ -92,8 +97,19 @@ func handleString(inputString string, resultChan chan AnalyseResult) {
 		}
 	}
 
-	resultChan <- AnalyseResult{charsOfCode:inputStringLen, charsOfValue:charsOfValue, inputString:inputString}
+	resultChan <- AnalyseResult{charsOfCode:inputStringLen,
+		charsOfValue:charsOfValue,
+		inputString:inputString,
+		totalEncodedChars:encodedCharsCount(inputString)}
 }
+
+func encodedCharsCount(inputString string) int {
+	newString := strings.Replace(inputString, "\\", "\\\\", -1)
+	newString = strings.Replace(newString, "\"", "\\\"", -1)
+
+	return utf8.RuneCountInString(newString) + 2 //outer quotes
+}
+
 func updateState(oldState *State, char rune) {
 	if oldState.id == NormalChar && char != '\\' {
 		return
