@@ -6,10 +6,10 @@ import (
 )
 
 func TestStringDecoding(t *testing.T) {
-	checkString("\"\"", 2, 0, 6, t)
-	checkString("\"abc\"", 5, 3, 9, t)
-	checkString("\"aaa\\\"aaa\"", 10, 7, 16, t)
-	checkString("\"\\x27\"", 6, 1, 11, t)
+	checkString(`""`, 2, 0, 6, t)
+	checkString(`"abc"`, 5, 3, 9, t)
+	checkString(`"aaa\"aaa"`, 10, 7, 16, t)
+	checkString(`"\x27"`, 6, 1, 11, t)
 }
 
 func checkString(inputString string, charsOfCode int, charsOfValue int, totalEncodedChars int, t *testing.T) {
