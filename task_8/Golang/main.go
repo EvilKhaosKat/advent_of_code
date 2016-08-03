@@ -29,7 +29,16 @@ type State struct {
 	id int
 }
 
+type Result struct {
+	encodedResult int
+	escapedResult int
+}
+
 func main() {
+	calculateResult()
+}
+
+func calculateResult() Result {
 	fmt.Println("Advent of code: Golang\nTask 8")
 
 	PrintCurrentDir()
@@ -41,10 +50,10 @@ func main() {
 	}
 	defer file.Close()
 
-	handleFile(file)
+	return handleFile(file)
 }
 
-func handleFile(file io.Reader) {
+func handleFile(file io.Reader) Result {
 	resultChan := make(chan AnalyseResult)
 
 	linesCount := 0
@@ -71,8 +80,13 @@ func handleFile(file io.Reader) {
 	fmt.Println("totalCharsOfCode:", totalCharsOfCode)
 	fmt.Println("totalCharsOfValue:", totalCharsOfValue)
 
-	fmt.Println("encodedResult:", totalCharsOfCode - totalCharsOfValue)
-	fmt.Println("escapedResult:", totalEncodedChars - totalCharsOfCode)
+	encodedResult := totalCharsOfCode - totalCharsOfValue
+	escapedResult := totalEncodedChars - totalCharsOfCode
+
+	fmt.Println("encodedResult:", encodedResult)
+	fmt.Println("escapedResult:", escapedResult)
+
+	return Result{encodedResult: encodedResult, escapedResult: escapedResult}
 }
 
 func handleString(inputString string, resultChan chan AnalyseResult) {

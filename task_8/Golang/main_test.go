@@ -5,11 +5,30 @@ import (
 	"fmt"
 )
 
+const (
+	CORRECT_ENCODED_RESULT = 1342
+	CORRECT_ESCAPED_RESULT = 2074
+)
+
 func TestStringDecoding(t *testing.T) {
 	checkString(`""`, 2, 0, 6, t)
 	checkString(`"abc"`, 5, 3, 9, t)
 	checkString(`"aaa\"aaa"`, 10, 7, 16, t)
 	checkString(`"\x27"`, 6, 1, 11, t)
+}
+
+func TestTaskInputResults(t *testing.T) {
+	result := calculateResult()
+
+	if result.encodedResult != CORRECT_ENCODED_RESULT {
+		t.Fatal(fmt.Sprintf("result.encodedResult equals %d, but must be %d",
+			result.encodedResult, CORRECT_ENCODED_RESULT))
+	}
+
+	if result.escapedResult != CORRECT_ESCAPED_RESULT {
+		t.Fatal(fmt.Sprintf("result.escapedResult equals %d, but must be %d",
+			result.escapedResult, CORRECT_ESCAPED_RESULT))
+	}
 }
 
 func checkString(inputString string, charsOfCode int, charsOfValue int, totalEncodedChars int, t *testing.T) {
