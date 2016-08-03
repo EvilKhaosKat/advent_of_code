@@ -3,6 +3,7 @@ package main
 import (
 	"testing"
 	"fmt"
+	. "github.com/franela/goblin"
 )
 
 const (
@@ -17,34 +18,38 @@ func TestStringDecoding(t *testing.T) {
 	checkString(`"\x27"`, 6, 1, 11, t)
 }
 
-func TestTaskInputResults(t *testing.T) {
-	result := calculateResult()
-
-	if result.encodedResult != CORRECT_ENCODED_RESULT {
-		t.Fatal(fmt.Sprintf("result.encodedResult equals %d, but must be %d",
-			result.encodedResult, CORRECT_ENCODED_RESULT))
-	}
-
-	if result.escapedResult != CORRECT_ESCAPED_RESULT {
-		t.Fatal(fmt.Sprintf("result.escapedResult equals %d, but must be %d",
-			result.escapedResult, CORRECT_ESCAPED_RESULT))
-	}
-}
-
 func checkString(inputString string, charsOfCode int, charsOfValue int, totalEncodedChars int, t *testing.T) {
 	resultChan := make(chan AnalyseResult, 1)
 
 	handleString(inputString, resultChan)
 	result := <-resultChan
 
-	if result.charsOfCode != charsOfCode {
-		t.Fatal(fmt.Sprintf("Fail for %s, charsOfCode equals %d, but must be %d",
-			result.inputString, result.charsOfCode, charsOfCode))
-	} else if result.charsOfValue != charsOfValue {
-		t.Fatal(fmt.Sprintf("Fail for %s, charsOfValue equals %d, but must be %d",
-			result.inputString, result.charsOfValue, charsOfValue))
-	} else if result.totalEncodedChars != totalEncodedChars {
-		t.Fatal(fmt.Sprintf("Fail for %s, totalEncodedChars equals %d, but must be %d",
-			result.inputString, result.totalEncodedChars, totalEncodedChars))
-	}
+	g := Goblin(t)
+	g.Describe(fmt.Sprintf("Sanity checks with %s", inputString), func() {
+		g.It(fmt.Sprintf("charsOfCode should be %d", charsOfCode), func() {
+			g.Assert(result.charsOfCode).Equal(charsOfCode)
+		})
+
+		g.It(fmt.Sprintf("charsOfValue should be %d", charsOfValue), func() {
+			g.Assert(result.charsOfValue).Equal(charsOfValue)
+		})
+
+		g.It(fmt.Sprintf("totalEncodedChars should be %d", totalEncodedChars), func() {
+			g.Assert(result.totalEncodedChars).Equal(totalEncodedChars)
+		})
+	})
+}
+
+func TestWithGoblin(t *testing.T) {
+	result := calculateResult()
+
+	g := Goblin(t)
+	g.Describe("Check with input ", func() {
+		g.It(fmt.Sprintf("First part result should be %d", CORRECT_ENCODED_RESULT), func() {
+			g.Assert(result.encodedResult).Equal(CORRECT_ENCODED_RESULT)
+		})
+		g.It(fmt.Sprintf("Second part result should be %d", CORRECT_ESCAPED_RESULT), func() {
+			g.Assert(result.escapedResult).Equal(CORRECT_ESCAPED_RESULT)
+		})
+	})
 }

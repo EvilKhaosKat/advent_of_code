@@ -70,7 +70,7 @@ func handleFile(file io.Reader) Result {
 	totalEncodedChars := 0
 	for i := 0; i < linesCount; i++ {
 		result := <-resultChan
-		fmt.Printf("read from results: %+v\n", result)
+		//fmt.Printf("read from results: %+v\n", result)
 
 		totalCharsOfCode += result.charsOfCode
 		totalCharsOfValue += result.charsOfValue
