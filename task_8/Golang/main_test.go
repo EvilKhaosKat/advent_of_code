@@ -18,11 +18,22 @@ func TestStringDecoding(t *testing.T) {
 	checkString(`"\x27"`, 6, 1, 11, t)
 }
 
-func checkString(inputString string, charsOfCode int, charsOfValue int, totalEncodedChars int, t *testing.T) {
-	resultChan := make(chan AnalyseResult, 1)
+func TestOnInput(t *testing.T) {
+	result := calculateResult()
 
-	handleString(inputString, resultChan)
-	result := <-resultChan
+	g := Goblin(t)
+	g.Describe("Check with input ", func() {
+		g.It(fmt.Sprintf("First part result should be %d", CORRECT_ENCODED_RESULT), func() {
+			g.Assert(result.encodedResult).Equal(CORRECT_ENCODED_RESULT)
+		})
+		g.It(fmt.Sprintf("Second part result should be %d", CORRECT_ESCAPED_RESULT), func() {
+			g.Assert(result.escapedResult).Equal(CORRECT_ESCAPED_RESULT)
+		})
+	})
+}
+
+func checkString(inputString string, charsOfCode int, charsOfValue int, totalEncodedChars int, t *testing.T) {
+	result := getAnalyseResult(inputString)
 
 	g := Goblin(t)
 	g.Describe(fmt.Sprintf("Sanity checks with %s", inputString), func() {
@@ -40,16 +51,9 @@ func checkString(inputString string, charsOfCode int, charsOfValue int, totalEnc
 	})
 }
 
-func TestWithGoblin(t *testing.T) {
-	result := calculateResult()
+func getAnalyseResult(inputString string) AnalyseResult {
+	resultChan := make(chan AnalyseResult, 1)
 
-	g := Goblin(t)
-	g.Describe("Check with input ", func() {
-		g.It(fmt.Sprintf("First part result should be %d", CORRECT_ENCODED_RESULT), func() {
-			g.Assert(result.encodedResult).Equal(CORRECT_ENCODED_RESULT)
-		})
-		g.It(fmt.Sprintf("Second part result should be %d", CORRECT_ESCAPED_RESULT), func() {
-			g.Assert(result.escapedResult).Equal(CORRECT_ESCAPED_RESULT)
-		})
-	})
+	handleString(inputString, resultChan)
+	return <-resultChan
 }
