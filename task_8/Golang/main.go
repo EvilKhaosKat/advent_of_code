@@ -41,8 +41,6 @@ func main() {
 func calculateResult() Result {
 	fmt.Println("Advent of code: Golang\nTask 8")
 
-	PrintCurrentDir()
-
 	file, err := os.Open("../input.txt")
 	if err != nil {
 		fmt.Println("Error opening input file:", err)
@@ -152,13 +150,4 @@ func updateState(oldState *State, char rune) {
 			oldState.id = Escape
 		}
 	}
-}
-
-func PrintCurrentDir() {
-	pwd, err := os.Getwd()
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-	fmt.Println("current dir: " + pwd)
 }
