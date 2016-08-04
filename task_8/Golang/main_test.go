@@ -3,7 +3,7 @@ package main
 import (
 	"testing"
 	"fmt"
-	. "github.com/franela/goblin"
+	"github.com/stretchr/testify/assert"
 )
 
 const (
@@ -21,34 +21,16 @@ func TestStringDecoding(t *testing.T) {
 func TestOnInput(t *testing.T) {
 	result := calculateResult()
 
-	g := Goblin(t)
-	g.Describe("Check with input ", func() {
-		g.It(fmt.Sprintf("First part result should be %d", CORRECT_ENCODED_RESULT), func() {
-			g.Assert(result.encodedResult).Equal(CORRECT_ENCODED_RESULT)
-		})
-		g.It(fmt.Sprintf("Second part result should be %d", CORRECT_ESCAPED_RESULT), func() {
-			g.Assert(result.escapedResult).Equal(CORRECT_ESCAPED_RESULT)
-		})
-	})
+	assert.Equal(t, result.encodedResult, CORRECT_ENCODED_RESULT, fmt.Sprintf("First part result should be %d", CORRECT_ENCODED_RESULT))
+	assert.Equal(t, result.escapedResult, CORRECT_ESCAPED_RESULT, fmt.Sprintf("Second part result should be %d", CORRECT_ESCAPED_RESULT))
 }
 
 func checkString(inputString string, charsOfCode int, charsOfValue int, totalEncodedChars int, t *testing.T) {
 	result := getAnalyseResult(inputString)
 
-	g := Goblin(t)
-	g.Describe(fmt.Sprintf("Sanity checks with %s", inputString), func() {
-		g.It(fmt.Sprintf("charsOfCode should be %d", charsOfCode), func() {
-			g.Assert(result.charsOfCode).Equal(charsOfCode)
-		})
-
-		g.It(fmt.Sprintf("charsOfValue should be %d", charsOfValue), func() {
-			g.Assert(result.charsOfValue).Equal(charsOfValue)
-		})
-
-		g.It(fmt.Sprintf("totalEncodedChars should be %d", totalEncodedChars), func() {
-			g.Assert(result.totalEncodedChars).Equal(totalEncodedChars)
-		})
-	})
+	assert.Equal(t, result.charsOfCode, charsOfCode, fmt.Sprintf("charsOfCode should be %d", charsOfCode))
+	assert.Equal(t, result.charsOfValue, charsOfValue, fmt.Sprintf("charsOfValue should be %d", charsOfValue))
+	assert.Equal(t, result.totalEncodedChars, totalEncodedChars, fmt.Sprintf("totalEncodedChars should be %d", totalEncodedChars))
 }
 
 func getAnalyseResult(inputString string) AnalyseResult {
