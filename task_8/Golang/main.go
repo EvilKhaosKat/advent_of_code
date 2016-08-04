@@ -116,8 +116,8 @@ func handleString(inputString string, resultChan chan AnalyseResult) {
 }
 
 func encodedCharsCount(inputString string) int {
-	newString := strings.Replace(inputString, "\\", "\\\\", -1)
-	newString = strings.Replace(newString, "\"", "\\\"", -1)
+	newString := strings.Replace(inputString, `\`, `\\`, -1)
+	newString = strings.Replace(newString, `"`, `\"`, -1)
 
 	return utf8.RuneCountInString(newString) + 2 //outer quotes
 }
