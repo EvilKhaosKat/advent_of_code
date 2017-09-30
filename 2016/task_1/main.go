@@ -52,10 +52,10 @@ func (line Line) isIntersected(otherLine Line) *Coor {
 
 	point := &Coor{verticalLine.start.x, horizontalLine.start.y}
 
-	if point.x >= min(horizontalLine.start.x, horizontalLine.end.x) &&
-		point.x <= max(horizontalLine.start.x, horizontalLine.end.x) &&
-		point.y >= min(verticalLine.start.y, verticalLine.end.y) &&
-		point.y <= max(verticalLine.start.y, verticalLine.end.y) {
+	if point.x > min(horizontalLine.start.x, horizontalLine.end.x) &&
+		point.x < max(horizontalLine.start.x, horizontalLine.end.x) &&
+		point.y > min(verticalLine.start.y, verticalLine.end.y) &&
+		point.y < max(verticalLine.start.y, verticalLine.end.y) {
 		return point
 	} else {
 		return nil
@@ -85,6 +85,9 @@ const (
 type Me struct {
 	coor      Coor
 	direction Direction
+
+	movesLines            []Line
+	firstIntersectionCoor *Coor
 }
 
 func (me *Me) left() {
@@ -98,6 +101,8 @@ func (me *Me) right() {
 }
 
 func (me *Me) move(distance int) {
+	start := me.coor
+
 	switch me.direction {
 	case north:
 		me.coor.y = me.coor.y + distance
@@ -108,10 +113,35 @@ func (me *Me) move(distance int) {
 	case west:
 		me.coor.x = me.coor.x - distance
 	}
+
+	end := me.coor
+
+	if me.firstIntersectionCoor != nil {
+		return
+	}
+
+	newMoveLine := Line{start, end}
+
+	intersectionCoordinate := checkIntersected(newMoveLine, me.movesLines)
+	if intersectionCoordinate != nil {
+		me.firstIntersectionCoor = intersectionCoordinate
+	}
+
+	me.movesLines = append(me.movesLines, newMoveLine)
+}
+
+func checkIntersected(line Line, lines []Line) *Coor {
+	for _, testLine := range lines {
+		if intersectionCoor := line.isIntersected(testLine); intersectionCoor != nil {
+			return intersectionCoor
+		}
+	}
+
+	return nil
 }
 
 func main() {
-	me := &Me{Coor{0, 0}, north}
+	me := initMe()
 
 	input := readInput()
 
@@ -121,6 +151,13 @@ func main() {
 	}
 
 	fmt.Println(math.Abs(float64(me.coor.x)) + math.Abs(float64(me.coor.y)))
+	fmt.Println(math.Abs(float64(me.firstIntersectionCoor.x)) + math.Abs(float64(me.firstIntersectionCoor.y)))
+	fmt.Println(me.firstIntersectionCoor)
+	fmt.Println(me.movesLines)
+}
+
+func initMe() *Me {
+	return &Me{Coor{0, 0}, north, nil, nil}
 }
 
 func executeCommand(rawCommand string, me *Me) {
