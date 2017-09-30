@@ -10,8 +10,8 @@ import (
 	"math"
 )
 
-type Direction int
 type Command int
+type Direction int
 
 func (d Direction) left() Direction {
 	result := d - 1
@@ -31,6 +31,10 @@ func (d Direction) right() Direction {
 	return result
 }
 
+type Coor struct {
+	x, y int
+}
+
 const (
 	north Direction = iota
 	east
@@ -44,7 +48,7 @@ const (
 )
 
 type Me struct {
-	x, y      int
+	coor Coor
 	direction Direction
 }
 
@@ -61,18 +65,18 @@ func (me *Me) right() {
 func (me *Me) move(distance int) {
 	switch me.direction {
 	case north:
-		me.y = me.y + distance
+		me.coor.y = me.coor.y + distance
 	case east:
-		me.x = me.x + distance
+		me.coor.x = me.coor.x + distance
 	case south:
-		me.y = me.y - distance
+		me.coor.y = me.coor.y - distance
 	case west:
-		me.x = me.x - distance
+		me.coor.x = me.coor.x - distance
 	}
 }
 
 func main() {
-	me := &Me{0, 0, north}
+	me := &Me{Coor{0, 0}, north}
 
 	input := readInput()
 
@@ -81,7 +85,7 @@ func main() {
 		executeCommand(rawCommand, me)
 	}
 
-	fmt.Println(math.Abs(float64(me.x)) + math.Abs(float64(me.y)))
+	fmt.Println(math.Abs(float64(me.coor.x)) + math.Abs(float64(me.coor.y)))
 }
 
 func executeCommand(rawCommand string, me *Me) {
