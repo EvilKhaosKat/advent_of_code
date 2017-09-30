@@ -4,10 +4,10 @@ import (
 	"bufio"
 	"fmt"
 	"log"
-	"os"
-	"strings"
-	"strconv"
 	"math"
+	"os"
+	"strconv"
+	"strings"
 )
 
 type Command int
@@ -35,6 +35,41 @@ type Coor struct {
 	x, y int
 }
 
+type Line struct {
+	start, end Coor
+}
+
+func (line Line) isIntersected(otherLine Line) *Coor {
+	var horizontalLine, verticalLine Line
+
+	if line.start.y == line.end.y {
+		horizontalLine = line
+		verticalLine = otherLine
+	} else {
+		horizontalLine = otherLine
+		verticalLine = line
+	}
+
+	point := &Coor{verticalLine.start.x, horizontalLine.start.y}
+
+	if point.x >= min(horizontalLine.start.x, horizontalLine.end.x) &&
+		point.x <= max(horizontalLine.start.x, horizontalLine.end.x) &&
+		point.y >= min(verticalLine.start.y, verticalLine.end.y) &&
+		point.y <= max(verticalLine.start.y, verticalLine.end.y) {
+		return point
+	} else {
+		return nil
+	}
+}
+
+func min(x int, y int) int {
+	return int(math.Min(float64(x), float64(y)))
+}
+
+func max(x int, y int) int {
+	return int(math.Max(float64(x), float64(y)))
+}
+
 const (
 	north Direction = iota
 	east
@@ -48,7 +83,7 @@ const (
 )
 
 type Me struct {
-	coor Coor
+	coor      Coor
 	direction Direction
 }
 
@@ -118,7 +153,6 @@ func parseCommand(rawCommand string) (Command, int) {
 
 	return command, distance
 }
-
 
 func readInput() string {
 	file, err := os.Open("./input.txt")
