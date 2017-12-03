@@ -67,12 +67,12 @@ func getLastNum(input string) int {
 	return getNumByString(lastChar)
 }
 
-func getNumByString(lastChar string) int {
-	lastNum, err := strconv.Atoi(lastChar)
+func getNumByString(numRaw string) int {
+	num, err := strconv.Atoi(numRaw)
 	if err != nil {
-		panic("Cannot get last num:" + err.Error())
+		panic("Cannot get num:" + err.Error())
 	}
-	return lastNum
+	return num
 }
 
 func readInput() string {
