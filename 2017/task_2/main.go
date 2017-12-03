@@ -14,9 +14,11 @@ func main() {
 	input := readInput()
 	parsedInput := parseInput(input)
 
-	result := solveFirst(parsedInput)
+	firstResult := solveFirst(parsedInput)
+	secondResult := solveSecond(parsedInput)
 
-	fmt.Println(result)
+	fmt.Println(firstResult)
+	fmt.Println(secondResult)
 }
 
 func solveFirst(parsedInput [][]int) int {
@@ -40,6 +42,51 @@ func solveFirst(parsedInput [][]int) int {
 	}
 
 	return checksum
+}
+
+func solveSecond(parsedInput [][]int) int {
+	checksum := 0
+
+	for _, line := range parsedInput {
+		checksum += getQuotient(line)
+	}
+
+	return checksum
+}
+
+func getQuotient(line []int) int {
+	for firstIndex, firstNum := range line {
+		for secondIndex, secondNum := range line {
+			if firstIndex == secondIndex {
+				continue
+			}
+
+			max := max(firstNum, secondNum)
+			min := min(firstNum, secondNum)
+
+			if max % min == 0 {
+				return max / min
+			}
+		}
+	}
+
+	panic("quotient not found") //TODO add line into message
+}
+
+func max(first, second int) int {
+	if first > second {
+		return first
+	} else {
+		return second
+	}
+}
+
+func min(first, second int) int {
+	if first < second {
+		return first
+	} else {
+		return second
+	}
 }
 
 func parseInput(input []string) [][]int {
