@@ -7,13 +7,39 @@ import (
 	"strconv"
 	"fmt"
 	"strings"
+	"math"
 )
 
 func main() {
 	input := readInput()
 	parsedInput := parseInput(input)
 
-	fmt.Println(parsedInput)
+	result := solveFirst(parsedInput)
+
+	fmt.Println(result)
+}
+
+func solveFirst(parsedInput [][]int) int {
+	checksum := 0
+
+	for _, line := range parsedInput {
+		min := math.MaxInt16
+		max := 0
+
+		for _, num := range line {
+			if num < min {
+				min = num
+			}
+
+			if num > max {
+				max = num
+			}
+		}
+
+		checksum += max - min
+	}
+
+	return checksum
 }
 
 func parseInput(input []string) [][]int {
