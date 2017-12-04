@@ -70,12 +70,9 @@ func getSquareSide(input int) int {
 		}
 	}
 }
+
 func getSquareArea(squareSide int) int {
 	return squareSide * squareSide
-}
-
-func getSquareAreaOLD(squareLevel int) int {
-	return (squareLevel*2 + 1) ^ 2
 }
 
 func getNumByString(numRaw string) int {
