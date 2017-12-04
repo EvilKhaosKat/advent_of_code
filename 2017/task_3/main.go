@@ -20,15 +20,34 @@ func solveFirst(input int) int {
 	squareSide := getSquareSide(input)
 	squareArea := getSquareArea(squareSide)
 
-	delta := squareArea - input
-
-	deltaRemainder := delta % squareSide
-
-	secondCoor := squareSide - deltaRemainder
-
 	middleCoor := (squareSide + 1) / 2
 
-	return getSquareLevel(squareSide) + abs(middleCoor - secondCoor)
+	fourthCorner := squareArea
+	thirdCorner := fourthCorner - squareSide + 1
+	secondCorner := thirdCorner - squareSide + 1
+	firstCorner := secondCorner - squareSide + 1
+
+	squareLevel := getSquareLevel(squareSide)
+
+	return squareLevel + getSecondCoor(input, squareLevel, middleCoor, firstCorner, secondCorner, thirdCorner, fourthCorner)
+}
+
+func getSecondCoor(input int, squareLevel int, middleCoor int, firstCorner int, secondCorner int, thirdCorner int, fourthCorner int) int {
+	if input == firstCorner || input == secondCorner || input == thirdCorner || input == fourthCorner {
+		return squareLevel
+	}
+
+	if input < firstCorner {
+		return abs(middleCoor - (firstCorner - input)) - 1
+	} else if input < secondCorner {
+		return abs(middleCoor - (secondCorner - input)) - 1
+	} else if input < thirdCorner {
+		return abs(middleCoor - (thirdCorner - input)) - 1
+	} else if input < fourthCorner {
+		return abs(middleCoor - (fourthCorner - input)) - 1
+	} else {
+		panic("second coor calc failed")
+	}
 }
 
 func abs(num int) int {

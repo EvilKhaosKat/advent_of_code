@@ -23,6 +23,12 @@ func Test1024(t *testing.T) {
 	checkResult(t, result, 31)
 }
 
+func Test31(t *testing.T) {
+	result := solveFirst(31)
+
+	checkResult(t, result, 6)
+}
+
 
 func checkResult(t *testing.T, actualResult int, requiredResult int) {
 	t.Helper()
