@@ -10,11 +10,12 @@ import (
 
 func main() {
 	input := readInput()
-	parsedInput := parseInput(input)
 
-	firstResult := solveFirst(parsedInput)
+	firstResult := solveFirst(parseInput(input))
+	secondResult := solveSecond(parseInput(input))
 
 	fmt.Println(firstResult)
+	fmt.Println(secondResult)
 }
 
 func parseInput(input []string) []int {
@@ -29,19 +30,46 @@ func parseInput(input []string) []int {
 
 func solveFirst(parsedInput []int) int {
 	stepsCount := 0
-	offset := 0
+	currentOffset := 0
 
 	offsetsListLen := len(parsedInput)
 
 	for {
-		if offset >= offsetsListLen {
+		if currentOffset >= offsetsListLen || currentOffset < 0 {
 			break
 		}
 
-		num := parsedInput[offset]
+		jumpValue := parsedInput[currentOffset]
 
-		parsedInput[offset] = num + 1
-		offset = offset + num
+		parsedInput[currentOffset] = jumpValue + 1
+		currentOffset = currentOffset + jumpValue
+
+		stepsCount++
+	}
+
+	return stepsCount
+}
+
+func solveSecond(parsedInput []int) int {
+	stepsCount := 0
+	currentOffset := 0
+
+	offsetsListLen := len(parsedInput)
+
+	for {
+		if currentOffset >= offsetsListLen || currentOffset < 0 {
+			break
+		}
+
+		jumpValue := parsedInput[currentOffset]
+
+		if jumpValue >= 3 {
+			parsedInput[currentOffset] = jumpValue - 1
+		} else {
+			parsedInput[currentOffset] = jumpValue + 1
+		}
+
+		currentOffset = currentOffset + jumpValue
 
 		stepsCount++
 	}
