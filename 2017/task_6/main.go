@@ -15,8 +15,10 @@ func main() {
 	banks := parseInput(input)
 
 	firstResult := solveFirst(banks)
+	secondResult := solveSecond(banks)
 
 	fmt.Println(firstResult)
+	fmt.Println(secondResult)
 }
 
 func solveFirst(banks []int) int {
@@ -43,6 +45,35 @@ func solveFirst(banks []int) int {
 	}
 
 	return stepsCount
+}
+
+func solveSecond(banks []int) int {
+	stepsCount := 0
+	sameStateStepsCount := 0
+	present := false
+
+	states := map[string]int{}
+
+	for {
+		maxIndex, maxBanks := getMaxNum(banks)
+
+		blocksToSpend := maxBanks
+		banks[maxIndex] = 0
+
+		redistributeBanks(maxIndex, blocksToSpend, banks)
+
+		stepsCount++
+
+		currentState := getCurrentState(banks)
+		sameStateStepsCount, present = states[currentState];
+		if present {
+			break
+		} else {
+			states[currentState] = stepsCount
+		}
+	}
+
+	return stepsCount - sameStateStepsCount
 }
 
 func redistributeBanks(maxIndex int, blocksToSpend int, banks []int) {
