@@ -13,26 +13,149 @@ type node struct {
 	name string
 	weight int
 
+	totalWeight int
+
 	rawChildren string
 
 	parent *node
 	children []*node
 }
 
+func (node *node) recalculateTotalWeight() int {
+	node.totalWeight = node.weight
+
+	if len(node.children) > 0 {
+		for _, child := range node.children {
+			node.totalWeight += child.recalculateTotalWeight()
+
+		}
+	}
+
+	return node.totalWeight
+}
+
+type refToNode *node
 type nodes []*node
+
 
 func main() {
 	input := readInputMultiLine()
 
 	firstResult := solveFirst(input)
+	secondResult := solveSecond(input)
 
 	fmt.Println(firstResult)
+	fmt.Println(secondResult)
 }
 
 func solveFirst(input []string) string {
 	topNode := buildGraph(input)
 
 	return topNode.name
+}
+
+func solveSecond(input []string) int {
+	topNode := buildGraph(input)
+	topNode.recalculateTotalWeight()
+
+	return getRequiredForBalanceWeight(topNode)
+}
+
+func getRequiredForBalanceWeight(node *node) int {
+	nodesToCheck := make(chan refToNode, 42) //good enough nodes buffer :3
+	nodesToCheck <- node
+
+	for checkNode := range nodesToCheck {
+		children := checkNode.children
+
+		if len(children) > 0 {
+			childrenCorrect, _, errorNode := isChildrenCorrect(children)
+			if childrenCorrect {
+				addChildrenToCheck(nodesToCheck, children)
+			} else {
+				lowestCorrectNode, lowestErrorNode := getLowestErrorNodes(errorNode)
+				return getCorrectWeight(lowestCorrectNode, lowestErrorNode)
+			}
+		}
+	}
+
+	return -1
+}
+
+func getLowestErrorNodes(errorNode *node) (lowestCorrectNode *node, lowestErrorNode *node) {
+	nodeToCheck := errorNode
+
+	for {
+		children := nodeToCheck.children
+
+		if len(children) > 0 {
+			childrenCorrect, _, errorNode := isChildrenCorrect(children)
+			if childrenCorrect {
+				return getLowestCorrectNode(nodeToCheck), nodeToCheck
+			} else {
+				nodeToCheck = errorNode
+			}
+		}
+
+	}
+
+
+}
+
+func getLowestCorrectNode(node *node) *node {
+	for _, child := range node.parent.children {
+		if child != node {
+			return child
+		}
+	}
+
+	return nil
+}
+
+func getCorrectWeight(correctNode *node, errorNode *node) int {
+	deltaWeight := correctNode.totalWeight - errorNode.totalWeight
+
+	return errorNode.weight + deltaWeight
+}
+
+func addChildrenToCheck(nodesToCheck chan refToNode, nodes []*node) {
+	for _, node := range nodes {
+		nodesToCheck <- node
+	}
+}
+
+func isChildrenCorrect(nodes []*node) (correct bool, correctNode *node, errorNode *node) {
+	for _, childNode := range nodes {
+		for _, childNodeToCheck := range nodes {
+			if childNode == childNodeToCheck {
+				continue
+			}
+
+			if childNode.totalWeight != childNodeToCheck.totalWeight {
+				if otherNodesSameWeightExist(nodes, childNode) {
+					return false, childNode, childNodeToCheck
+				} else {
+					return false, childNodeToCheck, childNode
+				}
+			}
+		}
+	}
+
+	return true, nil, nil
+}
+
+func otherNodesSameWeightExist(nodes []*node, node *node) bool {
+	for _, nodeToCheck := range nodes {
+		if node == nodeToCheck {
+			continue
+		}
+
+		if node.totalWeight == nodeToCheck.totalWeight {
+			return true
+		}
+	}
+
+	return false
 }
 
 func buildGraph(input []string) *node {
