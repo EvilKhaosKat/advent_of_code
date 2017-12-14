@@ -33,6 +33,32 @@ func TestSecondParseInput(t *testing.T) {
 	}
 }
 
+func TestSecondSplitBy16(t *testing.T) {
+	list := createList(256)
+
+	partsBy16 := splitHashBy16(list)
+
+	partsLen := len(partsBy16)
+	if partsLen != 16 {
+		t.Error(fmt.Printf("Required 16 parts, but got %v", partsLen))
+		t.Fail()
+	}
+
+	firstFirstValue := partsBy16[0][0]
+	if firstFirstValue != 0 {
+		t.Error(fmt.Printf("[0][0] should be 0, but %v", firstFirstValue))
+		fmt.Printf("\n%v", partsBy16)
+		t.Fail()
+	}
+
+	secondFirstValue := partsBy16[1][0]
+	if secondFirstValue != 16 {
+		t.Error(fmt.Printf("[1][0] should be 16, but %v", secondFirstValue))
+		fmt.Printf("\n%v", partsBy16)
+		t.Fail()
+	}
+}
+
 func checkResultString(t *testing.T, actualResult string, requiredResult string) {
 	t.Helper()
 

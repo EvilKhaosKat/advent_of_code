@@ -64,9 +64,36 @@ func solveFirst(listSize int, lengths []int) int {
 func solveSecond(listSize int, lengths []int) int {
 	list := createList(listSize)
 
+	//sparseHash := getSparseHash(lengths, list, listSize)
+	//denseHash := getDenseHash(sparseHash)
+
+	return list[0] * list[1]
+}
+
+func getDenseHash(sparseHash []int) []int {
+	//partsBy16 := splitHashBy16(sparseHash)
+	return nil
+}
+
+func splitHashBy16(sparseHash []int) [][]int {
+	var partsBy16 [][]int
+
+	for partNum := 0; partNum < 16; partNum++ {
+		var part []int
+
+		for i := 1; i <= 16; i++ {
+			part = append(part, sparseHash[partNum*16+i-1])
+		}
+
+		partsBy16 = append(partsBy16, part)
+	}
+
+	return partsBy16
+}
+
+func getSparseHash(lengths []int, list []int, listSize int) []int {
 	currentPos := 0
 	skipSize := 0
-
 	for i := 0; i < 64; i++ {
 		for _, length := range lengths {
 			list = reverseOrder(list, currentPos%listSize, length)
@@ -75,8 +102,7 @@ func solveSecond(listSize int, lengths []int) int {
 			skipSize++
 		}
 	}
-
-	return list[0] * list[1]
+	return list
 }
 
 func reverseOrder(list []int, currentPos int, length int) []int {
