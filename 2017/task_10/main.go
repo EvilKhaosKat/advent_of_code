@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"bytes"
 )
 
 func main() {
@@ -61,13 +62,25 @@ func solveFirst(listSize int, lengths []int) int {
 	return list[0] * list[1]
 }
 
-func solveSecond(listSize int, lengths []int) int {
+func solveSecond(listSize int, lengths []int) string {
 	list := createList(listSize)
 
-	//sparseHash := getSparseHash(lengths, list, listSize)
-	//denseHash := getDenseHash(sparseHash)
+	sparseHash := getSparseHash(lengths, list, listSize)
+	denseHash := getDenseHash(sparseHash)
+	hexString := getHexString(denseHash)
 
-	return list[0] * list[1]
+	return hexString
+}
+
+func getHexString(denseHash []int) string {
+	var hexStringBuffer bytes.Buffer
+
+	for _, num := range denseHash {
+		hexStringPart := fmt.Sprintf("%02x", num)
+		hexStringBuffer.WriteString(hexStringPart)
+	}
+
+	return hexStringBuffer.String()
 }
 
 func getDenseHash(sparseHash []int) []int {

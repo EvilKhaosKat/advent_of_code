@@ -65,6 +65,12 @@ func TestSecondXor(t *testing.T) {
 	checkResultInt(t, xor, 64)
 }
 
+func TestSecondHex(t *testing.T) {
+	xor := getHexString([]int{64, 7, 255})
+
+	checkResultString(t, xor, "4007ff")
+}
+
 func checkResultString(t *testing.T, actualResult string, requiredResult string) {
 	t.Helper()
 
