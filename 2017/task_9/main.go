@@ -15,16 +15,17 @@ type context struct {
 	ignoreActive bool
 
 	score int
+	removedGarbage int
 }
 
 func main() {
 	input := readInputSingleLine()
 
 	firstResult := solveFirst(input)
-	//secondResult := solveSecond(input)
+	secondResult := solveSecond(input)
 
 	fmt.Println(firstResult)
-	//fmt.Println(secondResult)
+	fmt.Println(secondResult)
 }
 
 func solveFirst(input string) int {
@@ -69,6 +70,52 @@ func solveFirst(input string) int {
 
 	return context.score
 }
+
+func solveSecond(input string) int {
+	context := context{}
+
+	for _, char := range input {
+		if context.ignoreActive {
+			context.ignoreActive = false
+			continue
+		}
+
+		if context.garbageActive && char == '!' {
+			context.ignoreActive = true
+			continue
+		}
+
+		if context.garbageActive && char != '>' {
+			context.removedGarbage++
+			continue
+		}
+
+		if context.garbageActive && char == '>' {
+			context.garbageActive = false
+			continue
+		}
+
+		if char == '<' {
+			context.garbageActive = true
+			continue
+		}
+
+		if char == '{' {
+			context.groupLevel++
+			continue
+		}
+
+		if char == '}' {
+			context.score += context.groupLevel
+			context.groupLevel--
+			continue
+		}
+	}
+
+	return context.removedGarbage
+}
+
+
 
 //
 //helper methods starts here

@@ -53,6 +53,48 @@ func TestFirst8(t *testing.T) {
 	checkResultInt(t, result, 3)
 }
 
+func TestSecond1(t *testing.T) {
+	result := solveSecond("<>")
+
+	checkResultInt(t, result, 0)
+}
+
+func TestSecond2(t *testing.T) {
+	result := solveSecond("<random characters>")
+
+	checkResultInt(t, result, 17)
+}
+
+func TestSecond3(t *testing.T) {
+	result := solveSecond("<<<<>")
+
+	checkResultInt(t, result, 3)
+}
+
+func TestSecond4(t *testing.T) {
+	result := solveSecond("<{!>}>")
+
+	checkResultInt(t, result, 2)
+}
+
+func TestSecond5(t *testing.T) {
+	result := solveSecond("<!!>")
+
+	checkResultInt(t, result, 0)
+}
+
+func TestSecond6(t *testing.T) {
+	result := solveSecond("<!!!>>")
+
+	checkResultInt(t, result, 0)
+}
+
+func TestSecond7(t *testing.T) {
+	result := solveSecond("<{o\"i!a,<{i<a>")
+
+	checkResultInt(t, result, 10)
+}
+
 func checkResultString(t *testing.T, actualResult string, requiredResult string) {
 	t.Helper()
 
