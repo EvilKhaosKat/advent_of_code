@@ -11,16 +11,17 @@ import (
 
 func main() {
 	input := readInputSingleLine()
-	parsedInput := parseInput(input)
 
-	firstResult := solveFirst(256, parsedInput)
-	//secondResult := solveSecond(input)
-
+	firstParsedInput := parseInputFirst(input)
+	firstResult := solveFirst(256, firstParsedInput)
 	fmt.Println(firstResult)
-	//fmt.Println(secondResult)
+
+	secondParsedInput := parseInputSecond(input)
+	secondResult := solveSecond(256, secondParsedInput)
+	fmt.Println(secondResult)
 }
 
-func parseInput(input string) []int {
+func parseInputFirst(input string) []int {
 	var parsedInput []int
 
 	rawNumbers := strings.Split(input, ",")
@@ -30,7 +31,18 @@ func parseInput(input string) []int {
 	}
 
 	return parsedInput
+}
 
+func parseInputSecond(input string) []int {
+	var parsedInput []int
+
+	for _, rawNumber := range input {
+		parsedInput = append(parsedInput, int(rawNumber))
+	}
+
+	parsedInput = append(parsedInput, []int{17, 31, 73, 47, 23}...)
+
+	return parsedInput
 }
 
 func solveFirst(listSize int, lengths []int) int {
@@ -44,6 +56,24 @@ func solveFirst(listSize int, lengths []int) int {
 
 		currentPos += length + skipSize
 		skipSize++
+	}
+
+	return list[0] * list[1]
+}
+
+func solveSecond(listSize int, lengths []int) int {
+	list := createList(listSize)
+
+	currentPos := 0
+	skipSize := 0
+
+	for i := 0; i < 64; i++ {
+		for _, length := range lengths {
+			list = reverseOrder(list, currentPos%listSize, length)
+
+			currentPos += length + skipSize
+			skipSize++
+		}
 	}
 
 	return list[0] * list[1]
@@ -65,7 +95,7 @@ func reverseList(list []int) []int {
 	listLength := len(list)
 
 	for i := 0; i < listLength/2; i++ {
-		exchangeValues(list, i, listLength - i - 1)
+		exchangeValues(list, i, listLength-i-1)
 	}
 
 	return list
