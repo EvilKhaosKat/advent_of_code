@@ -37,8 +37,6 @@ However, you should instead use the standard list size of 256 (with values 0 to 
 
 Your puzzle answer was 11375.
 
-The first half of this puzzle is complete! It provides one gold star: *
-
 --- Part Two ---
 
 The logic you've constructed forms a single round of the Knot Hash algorithm; running the full thing requires many of these rounds. Some input and output processing is also required.
@@ -65,3 +63,7 @@ AoC 2017 becomes 33efeb34ea91902bb2f59c9920caa6cd.
 1,2,3 becomes 3efbe78a8d82f29979031a4aa0b16a9d.
 1,2,4 becomes 63960835bcdc130f0b66d7ff4f6a5a8e.
 Treating your puzzle input as a string of ASCII characters, what is the Knot Hash of your puzzle input? Ignore any leading or trailing whitespace you might encounter.
+
+Your puzzle answer was e0387e2ad112b7c2ef344e44885fe4d8.
+
+Both parts of this puzzle are complete! They provide two gold stars: **

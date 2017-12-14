@@ -71,6 +71,31 @@ func TestSecondHex(t *testing.T) {
 	checkResultString(t, xor, "4007ff")
 }
 
+func TestSecondEmpty(t *testing.T) {
+	result := solveSecond(256, parseInputSecond(""))
+
+	checkResultString(t, result, "a2582a3a0e66e6e86e3812dcb672a272")
+}
+
+func TestSecondAoC2017(t *testing.T) {
+	result := solveSecond(256, parseInputSecond("AoC 2017"))
+
+	checkResultString(t, result, "33efeb34ea91902bb2f59c9920caa6cd")
+}
+
+func TestSecond123(t *testing.T) {
+	result := solveSecond(256, parseInputSecond("1,2,3"))
+
+	checkResultString(t, result, "3efbe78a8d82f29979031a4aa0b16a9d")
+}
+
+func TestSecond124(t *testing.T) {
+	result := solveSecond(256, parseInputSecond("1,2,4"))
+
+	checkResultString(t, result, "63960835bcdc130f0b66d7ff4f6a5a8e")
+}
+
+//helper functions
 func checkResultString(t *testing.T, actualResult string, requiredResult string) {
 	t.Helper()
 
