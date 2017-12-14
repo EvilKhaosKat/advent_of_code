@@ -115,8 +115,6 @@ func solveSecond(input string) int {
 	return context.removedGarbage
 }
 
-
-
 //
 //helper methods starts here
 //
