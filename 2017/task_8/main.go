@@ -15,10 +15,10 @@ func main() {
 	input := readInputMultiLine()
 
 	firstResult := solveFirst(input)
-	//secondResult := solveSecond(input)
+	secondResult := solveSecond(input)
 
 	fmt.Println(firstResult)
-	//fmt.Println(secondResult)
+	fmt.Println(secondResult)
 }
 
 func solveFirst(input []string) int {
@@ -36,6 +36,29 @@ func solveFirst(input []string) int {
 	}
 
 	return getMaxValue(registers)
+}
+
+func solveSecond(input []string) int {
+	registers := make(map[string]int)
+	maxValue := math.MinInt32
+
+	for _, line := range input {
+		operationCondition := strings.Split(line, " if ")
+
+		operation := operationCondition[0]
+		condition := operationCondition[1]
+
+		if isConditionTrue(condition, registers) {
+			registers = performOperation(operation, registers)
+
+			currentMaxValue := getMaxValue(registers)
+			if currentMaxValue > maxValue {
+				maxValue = currentMaxValue
+			}
+		}
+	}
+
+	return maxValue
 }
 
 func getMaxValue(registers map[string]int) int {
