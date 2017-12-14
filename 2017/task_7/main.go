@@ -98,8 +98,6 @@ func getLowestErrorNodes(errorNode *node) (lowestCorrectNode *node, lowestErrorN
 		}
 
 	}
-
-
 }
 
 func getLowestCorrectNode(node *node) *node {
