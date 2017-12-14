@@ -59,11 +59,17 @@ func TestSecondSplitBy16(t *testing.T) {
 	}
 }
 
+func TestSecondXor(t *testing.T) {
+	xor := getXoredPart([]int{65, 27, 9, 1, 4, 3, 40, 50, 91, 7, 6, 0, 2, 5, 68, 22})
+
+	checkResultInt(t, xor, 64)
+}
+
 func checkResultString(t *testing.T, actualResult string, requiredResult string) {
 	t.Helper()
 
 	if actualResult != requiredResult {
-		t.Error(fmt.Printf("top node name must be %+v, but: %+v", requiredResult, actualResult))
+		t.Error(fmt.Printf("required value must be %+v, but: %+v", requiredResult, actualResult))
 	}
 }
 
@@ -71,6 +77,6 @@ func checkResultInt(t *testing.T, actualResult int, requiredResult int) {
 	t.Helper()
 
 	if actualResult != requiredResult {
-		t.Error(fmt.Printf("required weight must be %+v, but: %+v", requiredResult, actualResult))
+		t.Error(fmt.Printf("required value must be %+v, but: %+v", requiredResult, actualResult))
 	}
 }

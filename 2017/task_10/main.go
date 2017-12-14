@@ -71,8 +71,24 @@ func solveSecond(listSize int, lengths []int) int {
 }
 
 func getDenseHash(sparseHash []int) []int {
-	//partsBy16 := splitHashBy16(sparseHash)
-	return nil
+	partsBy16 := splitHashBy16(sparseHash)
+
+	var denseHash []int
+
+	for i := 0; i < 16; i++ {
+		denseHash = append(denseHash, getXoredPart(partsBy16[i]))
+	}
+
+	return denseHash
+}
+
+func getXoredPart(partBy16 []int) int {
+	xor := 0
+
+	for _, num := range partBy16 {
+		xor = xor ^ num
+	}
+	return xor
 }
 
 func splitHashBy16(sparseHash []int) [][]int {
