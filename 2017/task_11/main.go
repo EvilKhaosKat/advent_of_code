@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"math"
 )
 
 func main() {
@@ -14,6 +15,9 @@ func main() {
 
 	firstResult := solveFirst(input)
 	fmt.Println(firstResult)
+
+	secondResult := solveSecond(input)
+	fmt.Println(secondResult)
 
 }
 
@@ -44,6 +48,47 @@ func solveFirst(input string) int {
 		}
 	}
 
+	return getDistanceFromStart(x, y, z)
+}
+
+func solveSecond(input string) int {
+	x := 0
+	y := 0
+	z := 0
+
+	maxDistance := math.MinInt32
+
+	for _, direction := range strings.Split(input, ",") {
+		if direction == "n" {
+			y++
+			z--
+		} else if direction == "ne" {
+			z--
+			x++
+		} else if direction == "se" {
+			y--
+			x++
+		} else if direction == "s" {
+			y--
+			z++
+		} else if direction == "sw" {
+			z++
+			x--
+		} else if direction == "nw" {
+			y++
+			x--
+		}
+
+		currentDistance := getDistanceFromStart(x, y, z)
+		if currentDistance > maxDistance {
+			maxDistance = currentDistance
+		}
+	}
+
+	return maxDistance
+}
+
+func getDistanceFromStart(x int, y int, z int) int {
 	return (abs(x) + abs(y) + abs(z)) / 2
 }
 
