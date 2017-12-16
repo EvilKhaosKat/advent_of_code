@@ -14,30 +14,59 @@ type Node struct {
 	links map[string]*Node
 }
 
+type Group map[string]bool
+
+//TODO doesn't look clear enough - simplify
 func main() {
 	input := readInputMultiLine()
 
 	firstResult := solveFirst(input)
 	fmt.Println(firstResult)
 
-	//secondResult := solveSecond(input)
-	//fmt.Println(secondResult)
-
+	secondResult := solveSecond(input)
+	fmt.Println(secondResult)
 }
 
 func solveFirst(input []string) int {
 	nodes := createNodes(input)
 
 	node0 := nodes["0"]
-	return calculateGraphNodesCount(node0)
+	return len(calculateGroupNodes(node0))
 }
 
-func calculateGraphNodesCount(rootNode *Node) int {
-	count := 0
+func solveSecond(input []string) int {
+	nodes := createNodes(input)
+	return calculateGroupsCount(nodes)
+}
 
+func calculateGroupsCount(nodes map[string]*Node) int {
+	var groups []Group
+
+	for _, node := range nodes {
+		if isNodeFromFoundGroup(groups, node) {
+			continue
+		} else {
+			groups = append(groups, calculateGroupNodes(node))
+		}
+	}
+
+	return len(groups)
+}
+
+func isNodeFromFoundGroup(groups []Group, node *Node) bool {
+	for _, group := range groups {
+		if _, present := group[node.name]; present {
+			return true
+		}
+	}
+
+	return false
+}
+
+func calculateGroupNodes(anyGraphNode *Node) map[string]bool {
 	visitedNodes := make(map[string]bool)
 	var nodesToCheck []*Node
-	nodesToCheck = append(nodesToCheck, rootNode)
+	nodesToCheck = append(nodesToCheck, anyGraphNode)
 
 	for {
 		if len(nodesToCheck) == 0 {
@@ -53,14 +82,12 @@ func calculateGraphNodesCount(rootNode *Node) int {
 
 		visitedNodes[nodeToCheck.name] = true
 
-		count++
-
 		for _, nodeToAdd := range nodeToCheck.links {
 			nodesToCheck = append(nodesToCheck, nodeToAdd)
 		}
 	}
 
-	return count
+	return visitedNodes
 }
 
 func createNodes(input []string) map[string]*Node {
