@@ -63,7 +63,7 @@ func isNodeFromFoundGroup(groups []Group, node *Node) bool {
 	return false
 }
 
-func calculateGroupNodes(anyGraphNode *Node) map[string]bool {
+func calculateGroupNodes(anyGraphNode *Node) Group {
 	visitedNodes := make(map[string]bool)
 	var nodesToCheck []*Node
 	nodesToCheck = append(nodesToCheck, anyGraphNode)
@@ -80,11 +80,12 @@ func calculateGroupNodes(anyGraphNode *Node) map[string]bool {
 			continue
 		}
 
-		visitedNodes[nodeToCheck.name] = true
 
 		for _, nodeToAdd := range nodeToCheck.links {
 			nodesToCheck = append(nodesToCheck, nodeToAdd)
 		}
+
+		visitedNodes[nodeToCheck.name] = true
 	}
 
 	return visitedNodes

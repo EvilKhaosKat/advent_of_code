@@ -27,41 +27,76 @@ type Layer struct {
 func main() {
 	input := readInputMultiLine()
 
-	firstResult := solveFirst(input)
+	firstResult, _ := solveFirst(input, 0)
 	fmt.Println(firstResult)
 
-	//secondResult := solveSecond(input)
-	//fmt.Println(secondResult)
+	secondResult := solveSecond(input)
+	fmt.Println(secondResult)
 }
 
-func solveFirst(input []string) int {
+func solveFirst(input []string, delayTicks int) (severity int, scannersFailed int) {
 	layers := initLayers(input)
 
-	layers = scannerTick(layers)
+	packetCoor := -1
 
-	packetCoor := 0
-	severity := 0
+	if delayTicks % 1000 == 0 {
+		fmt.Println("current delayTicks:" + strconv.Itoa(delayTicks))
+	}
 
 	for {
 		if packetCoor == len(layers)-1 {
 			break
 		}
 
-		packetCoor++
-		packetCaught := isPacketCaught(layers, packetCoor)
-		if packetCaught {
-			severity += packetCoor * layers[packetCoor].depth
+		if delayTicks > 0 {
+			delayTicks--
+		} else {
+			packetCoor++
+			packetCaught := isPacketCaught(layers, packetCoor)
+			if packetCaught {
+				severity += packetCoor * layers[packetCoor].depth
+				scannersFailed++
+			}
 		}
+
 		layers = scannerTick(layers)
 	}
 
-	return severity
+	return severity, scannersFailed
+}
+
+func getLayersString(layers []*Layer) string {
+	var result string
+
+	for _, layer := range layers {
+		if layer.empty {
+			result += "."
+		} else {
+			result += strconv.Itoa(layer.scannerPosition)
+		}
+	}
+
+	return result
+}
+
+//lazy and naive solution
+func solveSecond(input []string) int {
+	var delayTicks int
+
+	for delayTicks = 0; ; delayTicks++ {
+		_, scannersFailed := solveFirst(input, delayTicks)
+		if scannersFailed == 0 {
+			break
+		}
+	}
+
+	return delayTicks
 }
 
 func isPacketCaught(layers []*Layer, packetCoor int) bool {
 	layer := layers[packetCoor]
 
-	return layer.scannerPosition == 0
+	return !layer.empty && layer.scannerPosition == 0
 }
 
 func scannerTick(layers []*Layer) []*Layer {

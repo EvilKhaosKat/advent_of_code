@@ -17,14 +17,25 @@ func TestLayersCreation(t *testing.T) {
 }
 
 func TestFirst(t *testing.T) {
-	result := solveFirst([]string{
+	severity, _ := solveFirst([]string{
+		"0: 3",
+		"1: 2",
+		"4: 4",
+		"6: 4",
+	}, 0)
+
+	checkResultInt(t, severity, 24)
+}
+
+func TestSecond(t *testing.T) {
+	delayTick := solveSecond([]string{
 		"0: 3",
 		"1: 2",
 		"4: 4",
 		"6: 4",
 	})
 
-	checkResultInt(t, result, 24)
+	checkResultInt(t, delayTick, 10)
 }
 
 //
