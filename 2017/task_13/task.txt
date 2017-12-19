@@ -160,8 +160,6 @@ Given the details of the firewall you've recorded, if you leave immediately, wha
 
 Your puzzle answer was 1900.
 
-The first half of this puzzle is complete! It provides one gold star: *
-
 --- Part Two ---
 
 Now, you need to pass through the firewall without being caught - easier said than done.
@@ -276,3 +274,7 @@ Picosecond 16:
 Because all smaller delays would get you caught, the fewest number of picoseconds you would need to delay to get through safely is 10.
 
 What is the fewest number of picoseconds that you need to delay the packet to pass through the firewall without being caught?
+
+Your puzzle answer was 3966414.
+
+Both parts of this puzzle are complete! They provide two gold stars: **

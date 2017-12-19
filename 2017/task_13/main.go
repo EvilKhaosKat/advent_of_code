@@ -35,11 +35,11 @@ func main() {
 }
 
 func solveFirst(input []string, delayTicks int) (severity int, scannersFailed int) {
-	layers := initLayers(input)
+	layers := initLayers(input, delayTicks)
 
 	packetCoor := -1
 
-	if delayTicks % 1000 == 0 {
+	if delayTicks%1000 == 0 {
 		fmt.Println("current delayTicks:" + strconv.Itoa(delayTicks))
 	}
 
@@ -48,18 +48,14 @@ func solveFirst(input []string, delayTicks int) (severity int, scannersFailed in
 			break
 		}
 
-		if delayTicks > 0 {
-			delayTicks--
-		} else {
-			packetCoor++
-			packetCaught := isPacketCaught(layers, packetCoor)
-			if packetCaught {
-				severity += packetCoor * layers[packetCoor].depth
-				scannersFailed++
-			}
+		packetCoor++
+		packetCaught := isPacketCaught(layers, packetCoor)
+		if packetCaught {
+			severity += packetCoor * layers[packetCoor].depth
+			scannersFailed++
 		}
 
-		layers = scannerTick(layers)
+		layers = scannerTickLayers(layers)
 	}
 
 	return severity, scannersFailed
@@ -79,7 +75,7 @@ func getLayersString(layers []*Layer) string {
 	return result
 }
 
-//lazy and naive solution
+//instead of simulation try to calculate position of scanner by delay num
 func solveSecond(input []string) int {
 	var delayTicks int
 
@@ -90,7 +86,7 @@ func solveSecond(input []string) int {
 		}
 	}
 
-	return delayTicks
+	return delayTicks + 1
 }
 
 func isPacketCaught(layers []*Layer, packetCoor int) bool {
@@ -99,32 +95,35 @@ func isPacketCaught(layers []*Layer, packetCoor int) bool {
 	return !layer.empty && layer.scannerPosition == 0
 }
 
-func scannerTick(layers []*Layer) []*Layer {
+func scannerTickLayers(layers []*Layer) []*Layer {
 	for _, layer := range layers {
 		if !layer.empty {
-			depth := layer.depth
-
-			scannerPos := layer.scannerPosition
-			scannerDirection := layer.scannerDirection
-
-			if scannerPos == depth-1 && scannerDirection == DOWN {
-				layer.scannerPosition--
-				layer.scannerDirection = UP
-			} else if scannerPos == 0 && scannerDirection == UP {
-				layer.scannerPosition++
-				layer.scannerDirection = DOWN
-			} else if scannerPos >= 0 && scannerDirection == DOWN {
-				layer.scannerPosition++
-			} else if scannerDirection >= 0 && scannerDirection == UP {
-				layer.scannerPosition--
-			}
+			scannerTickLayer(layer)
 		}
 	}
 
 	return layers
 }
 
-func initLayers(input []string) []*Layer {
+func scannerTickLayer(layer *Layer) {
+	depth := layer.depth
+	scannerPos := layer.scannerPosition
+	scannerDirection := layer.scannerDirection
+
+	if scannerPos == depth-1 && scannerDirection == DOWN {
+		layer.scannerPosition--
+		layer.scannerDirection = UP
+	} else if scannerPos == 0 && scannerDirection == UP {
+		layer.scannerPosition++
+		layer.scannerDirection = DOWN
+	} else if scannerPos >= 0 && scannerDirection == DOWN {
+		layer.scannerPosition++
+	} else if scannerDirection >= 0 && scannerDirection == UP {
+		layer.scannerPosition--
+	}
+}
+
+func initLayers(input []string, delayTicks int) []*Layer {
 	var layers []*Layer
 
 	currentLayerNum := 0
@@ -141,7 +140,39 @@ func initLayers(input []string) []*Layer {
 		currentLayerNum++
 	}
 
+	if delayTicks > 0 {
+		for _, layer := range layers {
+			updateLayerScannerState(layer, delayTicks)
+		}
+	}
+
 	return layers
+}
+
+func updateLayerScannerState(layer *Layer, delayTicks int) {
+	if layer.empty {
+		return
+	}
+
+	cycleTicks := layer.depth + layer.depth - 2
+	//cyclesPassed := (delayTicks + 1) / cycleTicks
+	sidesPassed := (delayTicks + 1) / (cycleTicks/2)
+	ticksRemained := (delayTicks + 1) % (cycleTicks/2)
+	if ticksRemained < 0 {
+		ticksRemained = 0
+	}
+
+	evenSides := sidesPassed%2 == 0
+	if evenSides {
+		layer.scannerDirection = DOWN
+	} else {
+		layer.scannerPosition = layer.depth - 1
+		layer.scannerDirection = UP
+	}
+
+	for i := ticksRemained; i > 0; i-- {
+		scannerTickLayer(layer)
+	}
 }
 
 func createEmptyLayers(layers []*Layer, emptyLayersCount int) []*Layer {
