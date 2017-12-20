@@ -17,6 +17,12 @@ func TestFirst(t *testing.T) {
 	checkResultInt(t, usedSquaresCount, 8108)
 }
 
+func TestSecond(t *testing.T) {
+	usedSquaresCount := solveSecond("flqrgnkx")
+
+	checkResultInt(t, usedSquaresCount, 1242)
+}
+
 //
 //helper functions
 //

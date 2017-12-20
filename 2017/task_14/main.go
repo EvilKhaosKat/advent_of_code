@@ -9,19 +9,110 @@ import (
 	"bytes"
 )
 
+type Region struct {
+	squares map[Square]bool
+}
+
+func (region *Region) hasSquare(square Square) bool {
+	_, present := region.squares[square]
+	return present
+}
+
+func (region *Region) addSquare(square Square) {
+	region.squares[square] = true
+}
+
+type Square struct {
+	x, y int
+}
+
 func main() {
 	input := readInputSingleLine()
 
 	firstResult := solveFirst(input)
 	fmt.Println(firstResult)
 
-	//secondResult := solveSecond(input)
-	//fmt.Println(secondResult)
+	secondResult := solveSecond(input)
+	fmt.Println(secondResult)
 }
 
 func solveFirst(knotInput string) int {
-	var grid [][]int
+	grid := getGrid(knotInput)
+	return getUsedBlockCount(grid)
+}
 
+func solveSecond(knotInput string) int {
+	grid := getGrid(knotInput)
+	return getRegionsCount(grid)
+}
+
+func getRegionsCount(grid [][]int) int {
+	var regions []Region
+
+	for i, line := range grid {
+		for j, fieldValue := range line {
+			if fieldValue != 0 {
+				square := Square{i, j}
+				if !inFoundRegion(regions, square) {
+					region := Region{make(map[Square]bool)}
+					addSquareAndAllAdj(region, square, grid)
+
+					regions = append(regions, region)
+				}
+			}
+		}
+	}
+
+	return len(regions)
+}
+
+func addSquareAndAllAdj(region Region, square Square, grid [][]int) {
+	x := square.x
+	y := square.y
+
+	if isSquareNotInGrid(square, len(grid[0]), len(grid)) {
+		return
+	}
+
+	value := grid[x][y]
+	if value == 0 {
+		return
+	}
+
+	if region.hasSquare(square) {
+		return
+	}
+
+
+	region.addSquare(square)
+
+	upSquare := Square{x, y - 1}
+	downSquare := Square{x, y + 1}
+	leftSquare := Square{x - 1, y}
+	rightSquare := Square{x + 1, y}
+
+	addSquareAndAllAdj(region, upSquare, grid)
+	addSquareAndAllAdj(region, downSquare, grid)
+	addSquareAndAllAdj(region, leftSquare, grid)
+	addSquareAndAllAdj(region, rightSquare, grid)
+}
+
+func isSquareNotInGrid(square Square, maxX int, maxY int) bool {
+	return square.x >= maxX || square.x < 0 || square.y >= maxY || square.y < 0
+}
+
+func inFoundRegion(regions []Region, square Square) bool {
+	for _, region := range regions {
+		if region.hasSquare(square) {
+			return true
+		}
+	}
+
+	return false
+}
+
+func getGrid(knotInput string) [][]int {
+	var grid [][]int
 	for i := 0; i < 128; i++ {
 		knotHash := getKnotHash(256, parseInputKnotHash(knotInput+"-"+strconv.Itoa(i)))
 		binaryRepresenation := getBinaryKnotHash(knotHash)
@@ -39,8 +130,7 @@ func solveFirst(knotInput string) int {
 
 		grid = append(grid, line)
 	}
-
-	return getUsedBlockCount(grid)
+	return grid
 }
 
 func getUsedBlockCount(grid [][]int) int {
