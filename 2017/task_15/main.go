@@ -13,6 +13,7 @@ const (
 	GENERATOR_A_FACTOR = 16807
 	GENERATOR_B_FACTOR = 48271
 	DIVISOR            = 2147483647
+	ITERATIONS         = 40000000
 )
 
 type Generator struct {
@@ -55,8 +56,40 @@ func getGeneratorNumFromString(generatorInfoLine string) int {
 	return getNumByString(parts[len(parts)-1])
 }
 
-func solveFirst(firstGeneratorStart, secondGeneratorStart int) int {
-	return 0
+func solveFirst(generatorAStart, generatorBStart int) int {
+	generatorA := Generator{}
+	generatorB := Generator{}
+
+	resultsA := generatorA.run(GENERATOR_A_FACTOR, generatorAStart, ITERATIONS)
+	resultsB := generatorB.run(GENERATOR_B_FACTOR, generatorBStart, ITERATIONS)
+
+	judgeCount := 0
+
+	for i := 0; i<ITERATIONS; i++ {
+		logIfRequired(i)
+
+		valueA := <- resultsA
+		valueB := <- resultsB
+
+		if checkEqualGeneratorsValues(valueA, valueB) {
+			judgeCount++
+		}
+	}
+
+	return judgeCount
+}
+
+func logIfRequired(iteration int) {
+	if iteration % 100000 == 0 {
+		fmt.Println("iteration:" + strconv.Itoa(iteration))
+	}
+}
+
+func checkEqualGeneratorsValues(valueA int, valueB int) bool {
+	checkValueA := valueA << (64 - 16)
+	checkValueB := valueB << (64 - 16)
+
+	return checkValueA == checkValueB
 }
 
 //

@@ -47,6 +47,12 @@ func TestGeneratorGenerationB(t *testing.T) {
 	}
 }
 
+func TestComparison(t *testing.T) {
+	if !checkEqualGeneratorsValues(245556042, 1431495498) {
+		t.Error("should be equal, but they are not")
+	}
+}
+
 //
 //helper functions
 //
