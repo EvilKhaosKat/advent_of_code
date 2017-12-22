@@ -7,7 +7,7 @@ import (
 
 func TestGeneratorGenerationA(t *testing.T) {
 	generatorA := &Generator{}
-	results := generatorA.run(GENERATOR_A_FACTOR, 65, 5)
+	results := generatorA.run(GENERATOR_A_FACTOR, 65, NO_MULTIPLE_CHECK_REQUIRED,5)
 
 	requiredResults := map[int]int{
 		0: 1092455,
@@ -28,7 +28,7 @@ func TestGeneratorGenerationA(t *testing.T) {
 
 func TestGeneratorGenerationB(t *testing.T) {
 	generatorA := &Generator{}
-	results := generatorA.run(GENERATOR_B_FACTOR, 8921, 5)
+	results := generatorA.run(GENERATOR_B_FACTOR, 8921, NO_MULTIPLE_CHECK_REQUIRED,5)
 
 	requiredResults := map[int]int{
 		0: 430625591,
@@ -56,7 +56,7 @@ func TestComparison(t *testing.T) {
 //
 //helper functions
 //
-func checkResultString(t *testing.T, actualResult string, requiredResult string) {
+func checkResultString(t *testing.T, actualResult, requiredResult string) {
 	t.Helper()
 
 	if actualResult != requiredResult {
@@ -64,7 +64,7 @@ func checkResultString(t *testing.T, actualResult string, requiredResult string)
 	}
 }
 
-func checkResultInt(t *testing.T, actualResult int, requiredResult int) {
+func checkResultInt(t *testing.T, actualResult, requiredResult int) {
 	t.Helper()
 
 	if actualResult != requiredResult {

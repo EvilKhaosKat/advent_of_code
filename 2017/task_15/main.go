@@ -1,10 +1,11 @@
 package main
 
 import (
-	"os"
-	"log"
 	"bufio"
 	"fmt"
+	"log"
+	"os"
+	"runtime/pprof"
 	"strconv"
 	"strings"
 )
@@ -13,21 +14,35 @@ const (
 	GENERATOR_A_FACTOR = 16807
 	GENERATOR_B_FACTOR = 48271
 	DIVISOR            = 2147483647
-	ITERATIONS         = 40000000
+	ITERATIONS_FIRST   = 40000000
+	ITERATIONS_SECOND  = 5000000
+
+	MULTIPLE_CHECK_A           = 4
+	MULTIPLE_CHECK_B           = 8
+	NO_MULTIPLE_CHECK_REQUIRED = -1
 )
 
 type Generator struct {
 	results chan int
 }
 
-func (generator *Generator) run(factor, startNum, iterations int) chan int {
+func (generator *Generator) run(factor, startNum, multipleBy, requiredIterationsCount int) chan int {
 	generator.results = make(chan int, 42) //assuming 42 is enough for everything =^__^=
 	value := startNum
 
 	go func() {
-		for currentIterationNum := 0; currentIterationNum < iterations; currentIterationNum++ {
+		currentIterationNum := 0
+		for {
+			if currentIterationNum >= requiredIterationsCount {
+				break
+			}
+
 			value = (value * factor) % DIVISOR
-			generator.results <- value
+
+			if multipleBy == NO_MULTIPLE_CHECK_REQUIRED || value%multipleBy == 0 {
+				generator.results <- value
+				currentIterationNum++
+			}
 		}
 
 		close(generator.results)
@@ -37,13 +52,20 @@ func (generator *Generator) run(factor, startNum, iterations int) chan int {
 }
 
 func main() {
+	f, err := os.Create("meow.pprof")
+	if err != nil {
+		log.Fatal(err)
+	}
+	pprof.StartCPUProfile(f)
+	defer pprof.StopCPUProfile()
+
 	input := readInputMultiLine()
 
 	firstResult := solveFirst(parseInput(input))
 	fmt.Println(firstResult)
 
-	//secondResult := solveSecond(input)
-	//fmt.Println(secondResult)
+	secondResult := solveSecond(parseInput(input))
+	fmt.Println(secondResult)
 }
 
 func parseInput(input []string) (int, int) {
@@ -60,16 +82,39 @@ func solveFirst(generatorAStart, generatorBStart int) int {
 	generatorA := Generator{}
 	generatorB := Generator{}
 
-	resultsA := generatorA.run(GENERATOR_A_FACTOR, generatorAStart, ITERATIONS)
-	resultsB := generatorB.run(GENERATOR_B_FACTOR, generatorBStart, ITERATIONS)
+	resultsA := generatorA.run(GENERATOR_A_FACTOR, generatorAStart, NO_MULTIPLE_CHECK_REQUIRED, ITERATIONS_FIRST)
+	resultsB := generatorB.run(GENERATOR_B_FACTOR, generatorBStart, NO_MULTIPLE_CHECK_REQUIRED, ITERATIONS_FIRST)
 
 	judgeCount := 0
 
-	for i := 0; i<ITERATIONS; i++ {
-		logIfRequired(i)
+	for i := 0; i < ITERATIONS_FIRST; i++ {
+		//logIfRequired(i)
 
-		valueA := <- resultsA
-		valueB := <- resultsB
+		valueA := <-resultsA
+		valueB := <-resultsB
+
+		if checkEqualGeneratorsValues(valueA, valueB) {
+			judgeCount++
+		}
+	}
+
+	return judgeCount
+}
+
+func solveSecond(generatorAStart, generatorBStart int) int {
+	generatorA := Generator{}
+	generatorB := Generator{}
+
+	resultsA := generatorA.run(GENERATOR_A_FACTOR, generatorAStart, MULTIPLE_CHECK_A, ITERATIONS_SECOND)
+	resultsB := generatorB.run(GENERATOR_B_FACTOR, generatorBStart, MULTIPLE_CHECK_B, ITERATIONS_SECOND)
+
+	judgeCount := 0
+
+	for i := 0; i < ITERATIONS_SECOND; i++ {
+		//logIfRequired(i)
+
+		valueA := <-resultsA
+		valueB := <-resultsB
 
 		if checkEqualGeneratorsValues(valueA, valueB) {
 			judgeCount++
@@ -80,14 +125,14 @@ func solveFirst(generatorAStart, generatorBStart int) int {
 }
 
 func logIfRequired(iteration int) {
-	if iteration % 100000 == 0 {
+	if iteration%100000 == 0 {
 		fmt.Println("iteration:" + strconv.Itoa(iteration))
 	}
 }
 
 func checkEqualGeneratorsValues(valueA int, valueB int) bool {
-	checkValueA := valueA << (64 - 16)
-	checkValueB := valueB << (64 - 16)
+	checkValueA := valueA & 0xFFFF
+	checkValueB := valueB & 0xFFFF
 
 	return checkValueA == checkValueB
 }
