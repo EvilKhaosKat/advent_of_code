@@ -7,20 +7,18 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"runtime/pprof"
 )
 
 func main() {
-	firstResult := solveFirst(readInputSingleLine())
-	fmt.Println(firstResult)
+	firstResult := solveFirst(getProgramsByLine("abcdefghijklmnop"), getCommands(readInputSingleLine()))
+	fmt.Println(getStringByPrograms(firstResult))
 
-	//secondResult := solveSecond(parseInput(input))
-	//fmt.Println(secondResult)
+	secondResult := solveSecond(readInputSingleLine())
+	fmt.Println(getStringByPrograms(secondResult))
 }
 
-func solveFirst(input string) string {
-	programs := getProgramsByLine("abcdefghijklmnop")
-
-	commands := strings.Split(input, ",")
+func solveFirst(programs []string, commands []string) []string {
 	for _, command := range commands {
 		commandType := command[0]
 		if commandType == 's' {
@@ -32,7 +30,38 @@ func solveFirst(input string) string {
 		}
 	}
 
-	return getStringByPrograms(programs)
+	return programs
+}
+
+func getCommands(input string) []string {
+	return strings.Split(input, ",")
+}
+
+func solveSecond(input string) []string {
+	f, err := os.Create("meow.prof")
+	if err != nil {
+		log.Fatal(err)
+	}
+	pprof.StartCPUProfile(f)
+	defer pprof.StopCPUProfile()
+
+
+	commands := getCommands(input)
+	programs := getProgramsByLine("abcdefghijklmnop")
+
+	for i := 0; i < 10000/*1000000000*/; i++ {
+		programs = solveFirst(programs, commands)
+
+		logIfRequired(i)
+	}
+
+	return programs
+}
+
+func logIfRequired(iteration int) {
+	if iteration%1000000 == 0 {
+		fmt.Println("iteration:" + strconv.Itoa(iteration))
+	}
 }
 
 //params=1/2
