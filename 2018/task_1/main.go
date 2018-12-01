@@ -14,8 +14,8 @@ func main() {
 	resultFirst := solveFirst(input)
 	fmt.Println(resultFirst)
 
-	//resultSecond := solveSecond(input)
-	//fmt.Println(resultSecond)
+	resultSecond := solveSecond(input)
+	fmt.Println(resultSecond)
 }
 
 func solveFirst(input[] string) int {
@@ -28,6 +28,21 @@ func solveFirst(input[] string) int {
 	return freq
 }
 
+func solveSecond(input[] string) int {
+	freq := 0
+	freqMet := make(map[int]bool)
+
+	for {
+		for _, inputLine := range input {
+			freq += getNumByString(inputLine)
+			if freqMet[freq] {
+				return freq
+			} else {
+				freqMet[freq] = true
+			}
+		}
+	}
+}
 
 func getNumByString(numRaw string) int {
 	num, err := strconv.Atoi(numRaw)
