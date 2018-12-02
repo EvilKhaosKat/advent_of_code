@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 )
 
 func main() {
@@ -13,8 +14,8 @@ func main() {
 	resultFirst := solveFirst(input)
 	fmt.Println(resultFirst)
 
-	//resultSecond := solveSecond(input)
-	//fmt.Println(resultSecond)
+	resultSecond := solveSecond(input)
+	fmt.Println(resultSecond)
 }
 
 func solveFirst(input[] string) int {
@@ -27,6 +28,44 @@ func solveFirst(input[] string) int {
 	}
 
 	return totalTwoCount * totalThreeCount
+}
+
+func solveSecond(input[] string) string {
+	for lineNum, inputLine := range input {
+		for i := lineNum + 1; i < len(input); i++ {
+			if suitable, diff := suitableDifference(inputLine, input[i]); suitable {
+				return diff
+			}
+		}
+	}
+
+	panic("not found")
+}
+
+
+func suitableDifference(first string, second string) (bool, string) {
+	diffPosition := -1
+
+	for charNum, char := range first {
+		if char != []rune(second)[charNum] {
+			if diffPosition != -1 {
+				return false, ""
+			}
+
+			diffPosition = charNum
+		}
+	}
+
+	var result strings.Builder
+	for charNum, char := range first {
+		if charNum == diffPosition {
+			continue
+		}
+
+		result.WriteRune(char)
+	}
+
+	return true, result.String()
 }
 
 func parseId(id string) (int, int) {
