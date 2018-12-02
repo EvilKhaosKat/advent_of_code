@@ -33,6 +33,6 @@ func checkResult(t *testing.T, actualResult int, requiredResult int) {
 	t.Helper()
 
 	if actualResult != requiredResult {
-		t.Error(fmt.Printf("checksum must be %+v, but: %+v", requiredResult, actualResult))
+		t.Error(fmt.Printf("frequency must be %+v, but: %+v", requiredResult, actualResult))
 	}
 }
