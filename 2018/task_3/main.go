@@ -15,9 +15,10 @@ const (
 )
 
 type claim struct {
-	id            string
+	id            int
 	topX, topY    int
 	width, height int
+	overlaps      bool
 }
 
 func main() {
@@ -26,8 +27,8 @@ func main() {
 	resultFirst := solveFirst(input)
 	fmt.Println(resultFirst)
 
-	//resultSecond := solveSecond(input)
-	//fmt.Println(resultSecond)
+	resultSecond := solveSecond(input)
+	fmt.Println(resultSecond)
 }
 
 func solveFirst(input []string) int {
@@ -35,18 +36,38 @@ func solveFirst(input []string) int {
 
 	for _, inputLine := range input {
 		claim := parseClaim(inputLine)
-		fabric = applyClaim(fabric, claim)
+		fabric, _ = applyClaim(fabric, claim)
 	}
 
 	return getMultipleClaimsCount(fabric)
 }
 
-func getMultipleClaimsCount(fabric [][]int) int {
+func solveSecond(input []string) int {
+	fabric := initFabric(fabricSize)
+	var claims []*claim
+
+	for _, inputLine := range input {
+		claim := parseClaim(inputLine)
+		fabric, claim = applyClaim(fabric, claim)
+
+		claims = append(claims, claim)
+	}
+
+	for _, claim := range claims {
+		if !claim.overlaps {
+			return claim.id
+		}
+	}
+
+	panic("not overlapped claim not found")
+}
+
+func getMultipleClaimsCount(fabric [][][]*claim) int {
 	multipleClaims := 0
 
 	for x := 0; x < len(fabric); x++ {
 		for y := 0; y < len(fabric[0]); y++ {
-			if fabric[x][y] > 1 {
+			if overlappedSquare(fabric, x, y) {
 				multipleClaims++
 			}
 		}
@@ -55,18 +76,28 @@ func getMultipleClaimsCount(fabric [][]int) int {
 	return multipleClaims
 }
 
-func applyClaim(fabric [][]int, claim claim) [][]int {
+func applyClaim(fabric [][][]*claim, claim *claim) ([][][]*claim, *claim) {
 	for x := claim.topX; x < claim.topX+claim.width; x++ {
 		for y := claim.topY; y < claim.topY+claim.height; y++ {
-			fabric[x][y] = fabric[x][y] + 1
+			fabric[x][y] = append(fabric[x][y], claim)
+
+			if overlappedSquare(fabric, x, y) {
+				for _, claimToUpdate := range fabric[x][y] {
+					claimToUpdate.overlaps = true
+				}
+			}
 		}
 	}
 
-	return fabric
+	return fabric, claim
+}
+
+func overlappedSquare(fabric [][][]*claim, x int, y int) bool {
+	return len(fabric[x][y]) > 1
 }
 
 //#123 @ 3,2: 5x4
-func parseClaim(claimString string) claim {
+func parseClaim(claimString string) *claim {
 	splitFunc := func(c rune) bool {
 		return !unicode.IsNumber(c)
 	}
@@ -74,18 +105,18 @@ func parseClaim(claimString string) claim {
 	fields := strings.FieldsFunc(claimString, splitFunc)
 
 	//TODO named regexp - better readability?
-	return claim{fields[0], getNumByString(fields[1]), getNumByString(fields[2]),
-		getNumByString(fields[3]), getNumByString(fields[4])}
+	return &claim{getNumByString(fields[0]), getNumByString(fields[1]), getNumByString(fields[2]),
+		getNumByString(fields[3]), getNumByString(fields[4]),
+		false}
 }
 
-func initFabric(size int) [][]int {
-	fabric := make([][]int, size)
+func initFabric(size int) [][][]*claim {
+	fabric := make([][][]*claim, size)
 
 	for i := range fabric {
-		fabric[i] = make([]int, size)
+		fabric[i] = make([][]*claim, size)
 	}
 
-	//TODO keep id of claims?
 	return fabric
 }
 
