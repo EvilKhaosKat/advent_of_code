@@ -21,6 +21,8 @@ type claim struct {
 	overlaps      bool
 }
 
+type square []*claim
+
 func main() {
 	input := readInput()
 
@@ -62,7 +64,7 @@ func solveSecond(input []string) int {
 	panic("not overlapped claim not found")
 }
 
-func getMultipleClaimsCount(fabric [][][]*claim) int {
+func getMultipleClaimsCount(fabric [][]square) int {
 	multipleClaims := 0
 
 	for x := 0; x < len(fabric); x++ {
@@ -76,7 +78,7 @@ func getMultipleClaimsCount(fabric [][][]*claim) int {
 	return multipleClaims
 }
 
-func applyClaim(fabric [][][]*claim, claim *claim) ([][][]*claim, *claim) {
+func applyClaim(fabric [][]square, claim *claim) ([][]square, *claim) {
 	for x := claim.topX; x < claim.topX+claim.width; x++ {
 		for y := claim.topY; y < claim.topY+claim.height; y++ {
 			fabric[x][y] = append(fabric[x][y], claim)
@@ -92,7 +94,7 @@ func applyClaim(fabric [][][]*claim, claim *claim) ([][][]*claim, *claim) {
 	return fabric, claim
 }
 
-func overlappedSquare(fabric [][][]*claim, x int, y int) bool {
+func overlappedSquare(fabric [][]square, x int, y int) bool {
 	return len(fabric[x][y]) > 1
 }
 
@@ -110,11 +112,11 @@ func parseClaim(claimString string) *claim {
 		false}
 }
 
-func initFabric(size int) [][][]*claim {
-	fabric := make([][][]*claim, size)
+func initFabric(size int) [][]square {
+	fabric := make([][]square, size)
 
 	for i := range fabric {
-		fabric[i] = make([][]*claim, size)
+		fabric[i] = make([]square, size)
 	}
 
 	return fabric
