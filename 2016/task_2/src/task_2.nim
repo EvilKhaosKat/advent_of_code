@@ -1,5 +1,8 @@
 import strutils
 
+let input = readFile("input.txt").strip.splitLines
+
+
 type
   Keypad[W, H: static[int]] = array[0..W-1, array[0..H-1, int]]
   Coordinate = object
@@ -31,8 +34,6 @@ proc applyMovement(coordinate: Coordinate, movement: char,
       echo "unknown movement " & movement
 
 
-let input = readFile("input.txt").strip.splitLines
-
 proc solveFirst*(input: seq[string]): string =
   let keypad: Keypad[3, 3] = [
     [1, 2, 3],
@@ -50,5 +51,6 @@ proc solveFirst*(input: seq[string]): string =
     code = code & $keypad[coordinate.y][coordinate.x]
 
   return code
+
 
 echo solveFirst(input)
