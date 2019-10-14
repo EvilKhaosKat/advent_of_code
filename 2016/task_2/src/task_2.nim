@@ -50,7 +50,7 @@ proc solve(input: seq[string], keypad: Keypad, initialCoordinate: Coordinate): s
     for movement in line:
       let originalCoordinate = coordinate
 
-      coordinate = applyMovement(coordinate, movement, maxX = keypad.high, maxY = keypad.high)
+      coordinate = applyMovement(coordinate, movement, maxX = keypad[0].high, maxY = keypad.high)
 
       if keypad[coordinate.y][coordinate.x] == ' ':
         coordinate = originalCoordinate
