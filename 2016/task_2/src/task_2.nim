@@ -33,35 +33,9 @@ proc applyMovement(coordinate: Coordinate, movement: char,
     else:
       echo "unknown movement " & movement
 
+proc solve(input: seq[string], keypad: Keypad, initialCoordinate: Coordinate): string =
+  var coordinate = initialCoordinate
 
-proc solveFirst*(input: seq[string]): string =
-  let keypad: Keypad[3, 3] = [
-    ['1', '2', '3'],
-    ['4', '5', '6'],
-    ['7', '8', '9']
-  ]
-
-  var coordinate = Coordinate(x: 1, y: 1)
-  var code: string
-
-  for line in input:
-    for movement in line:
-      coordinate = applyMovement(coordinate, movement, maxX = keypad.high, maxY = keypad.high)
-
-    code = code & $keypad[coordinate.y][coordinate.x]
-
-  return code
-
-proc solveSecond*(input: seq[string]): string =
-  let keypad: Keypad[5, 5] = [
-    [' ', ' ', '1', ' ', ' '],
-    [' ', '2', '3', '4', ' '],
-    ['5', '6', '7', '8', '9'],
-    [' ', 'A', 'B', 'C', ' '],
-    [' ', ' ', 'D', ' ', ' ']
-  ]
-
-  var coordinate = Coordinate(x: 0, y: 2)
   var code: string
 
   for line in input:
@@ -75,6 +49,26 @@ proc solveSecond*(input: seq[string]): string =
     code = code & keypad[coordinate.y][coordinate.x]
 
   return code
+
+proc solveFirst*(input: seq[string]): string =
+  let keypad: Keypad[3, 3] = [
+    ['1', '2', '3'],
+    ['4', '5', '6'],
+    ['7', '8', '9']
+  ]
+
+  return solve(input, keypad, Coordinate(x: 1, y: 1))
+
+proc solveSecond*(input: seq[string]): string =
+  let keypad: Keypad[5, 5] = [
+    [' ', ' ', '1', ' ', ' '],
+    [' ', '2', '3', '4', ' '],
+    ['5', '6', '7', '8', '9'],
+    [' ', 'A', 'B', 'C', ' '],
+    [' ', ' ', 'D', ' ', ' ']
+  ]
+
+  return solve(input, keypad, Coordinate(x: 0, y: 2))
 
 
 echo solveFirst(input)
