@@ -1,6 +1,15 @@
 import strutils
 
-let input = readFile("input.txt").strip.splitLines
+
+proc solveFirst*(input: seq[string]): string
+proc solveSecond*(input: seq[string]): string
+
+
+when isMainModule:
+  let input = readFile("input.txt").strip.splitLines
+
+  echo solveFirst(input)
+  echo solveSecond(input)
 
 
 type
@@ -16,8 +25,7 @@ proc decLimit(number: int, min = 0): int =
   if number == min: return min
   return number - 1
 
-proc applyMovement(coordinate: Coordinate, movement: char,
-                   maxX, maxY: int): Coordinate =
+proc applyMovement(coordinate: Coordinate, movement: char, maxX, maxY: int): Coordinate =
   result.x = coordinate.x
   result.y = coordinate.y
 
@@ -40,9 +48,10 @@ proc solve(input: seq[string], keypad: Keypad, initialCoordinate: Coordinate): s
 
   for line in input:
     for movement in line:
-      let originalCoordinate = coordinate 
+      let originalCoordinate = coordinate
 
       coordinate = applyMovement(coordinate, movement, maxX = keypad.high, maxY = keypad.high)
+
       if keypad[coordinate.y][coordinate.x] == ' ':
         coordinate = originalCoordinate
 
@@ -69,7 +78,3 @@ proc solveSecond*(input: seq[string]): string =
   ]
 
   return solve(input, keypad, Coordinate(x: 0, y: 2))
-
-
-echo solveFirst(input)
-echo solveSecond(input)
