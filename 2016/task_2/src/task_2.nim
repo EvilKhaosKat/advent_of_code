@@ -4,7 +4,7 @@ let input = readFile("input.txt").strip.splitLines
 
 
 type
-  Keypad[W, H: static[int]] = array[0..W-1, array[0..H-1, int]]
+  Keypad[W, H: static[int]] = array[0..W-1, array[0..H-1, char]]
   Coordinate = object
     x, y: int
 
@@ -36,9 +36,9 @@ proc applyMovement(coordinate: Coordinate, movement: char,
 
 proc solveFirst*(input: seq[string]): string =
   let keypad: Keypad[3, 3] = [
-    [1, 2, 3],
-    [4, 5, 6],
-    [7, 8, 9]
+    ['1', '2', '3'],
+    ['4', '5', '6'],
+    ['7', '8', '9']
   ]
 
   var coordinate = Coordinate(x: 1, y: 1)
@@ -46,11 +46,36 @@ proc solveFirst*(input: seq[string]): string =
 
   for line in input:
     for movement in line:
-      coordinate = applyMovement(coordinate, movement, maxX = 2, maxY = 2)
+      coordinate = applyMovement(coordinate, movement, maxX = keypad.high, maxY = keypad.high)
 
     code = code & $keypad[coordinate.y][coordinate.x]
 
   return code
 
+proc solveSecond*(input: seq[string]): string =
+  let keypad: Keypad[5, 5] = [
+    [' ', ' ', '1', ' ', ' '],
+    [' ', '2', '3', '4', ' '],
+    ['5', '6', '7', '8', '9'],
+    [' ', 'A', 'B', 'C', ' '],
+    [' ', ' ', 'D', ' ', ' ']
+  ]
+
+  var coordinate = Coordinate(x: 0, y: 2)
+  var code: string
+
+  for line in input:
+    for movement in line:
+      let originalCoordinate = coordinate 
+
+      coordinate = applyMovement(coordinate, movement, maxX = keypad.high, maxY = keypad.high)
+      if keypad[coordinate.y][coordinate.x] == ' ':
+        coordinate = originalCoordinate
+
+    code = code & keypad[coordinate.y][coordinate.x]
+
+  return code
+
 
 echo solveFirst(input)
+echo solveSecond(input)
