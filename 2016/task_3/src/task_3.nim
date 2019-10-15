@@ -11,11 +11,10 @@ when isMainModule:
 
 
 proc solveFirst*(input: seq[string]): int =
-  for line in input:
-    var numbers = line
-      .split({' '})
+  input
+    .mapIt(it.split({' '})
       .filterIt(it != "")
       .mapIt(it.parseInt)
-      .sorted
-
-    if numbers[0] + numbers[1] > numbers[2]: result.atomicInc
+      .sorted)
+    .mapIt(if it[0] + it[1] > it[2]: 1 else: 0)
+    .foldl(a + b)
