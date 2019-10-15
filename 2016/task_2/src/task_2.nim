@@ -1,4 +1,4 @@
-import strutils
+import strutils, sequtils
 
 
 proc solveFirst*(input: seq[string]): string
@@ -44,20 +44,19 @@ proc applyMovement(coordinate: Coordinate, movement: char, maxX, maxY: int): Coo
 proc solve(input: seq[string], keypad: Keypad, initialCoordinate: Coordinate): string =
   var coordinate = initialCoordinate
 
-  var code: string
+  return input
+    .map(proc(line: string): char =
+      for movement in line:
+        let originalCoordinate = coordinate
 
-  for line in input:
-    for movement in line:
-      let originalCoordinate = coordinate
+        coordinate = applyMovement(coordinate, movement, maxX = keypad[0].high, maxY = keypad.high)
 
-      coordinate = applyMovement(coordinate, movement, maxX = keypad[0].high, maxY = keypad.high)
-
-      if keypad[coordinate.y][coordinate.x] == ' ':
-        coordinate = originalCoordinate
-
-    code = code & keypad[coordinate.y][coordinate.x]
-
-  return code
+        if keypad[coordinate.y][coordinate.x] == ' ':
+          coordinate = originalCoordinate
+      
+      return keypad[coordinate.y][coordinate.x]
+    )
+    .foldl(a & b, "")
 
 proc solveFirst*(input: seq[string]): string =
   let keypad: Keypad[3, 3] = [
