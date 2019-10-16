@@ -5,7 +5,7 @@ proc solveFirst*(input: seq[string]): int
 
 
 when isMainModule:
-  let input = readFile("input.txt").strip.splitLines
+  let input = readFile("../input.txt").strip.splitLines
 
   echo solveFirst(input)
 

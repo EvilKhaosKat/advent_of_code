@@ -1,0 +1,13 @@
+name: part_2
+version: 0.1.0
+
+authors:
+  - Roman Garanin <evilkhaoskat@gmail.com>
+
+targets:
+  part_2:
+    main: src/part_2.cr
+
+crystal: 0.31.1
+
+license: MIT
