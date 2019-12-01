@@ -1,6 +1,6 @@
-import  ../src/task_1
+import ../src/task_1
 
-when isMainModule: 
+when isMainModule:
     doAssert solveFirst(@["14"]) == 2
     doAssert solveFirst(@["1969"]) == 654
     doAssert solveFirst(@["14", "1969"]) == 656

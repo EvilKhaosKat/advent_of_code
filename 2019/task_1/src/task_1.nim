@@ -15,7 +15,7 @@ when isMainModule:
 proc calcFuel(mass: int): int =
   return mass div 3 - 2
 
-proc calcFullFuel(mass: int, fullMass = 0): int = 
+proc calcFullFuel(mass: int, fullMass = 0): int =
   let fuelMass = calcFuel mass
 
   if fuelMass < 0:
