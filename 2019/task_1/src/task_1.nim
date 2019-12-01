@@ -18,7 +18,7 @@ proc calcFuel(mass: int): int =
 proc calcFullFuel(mass: int, fullMass = 0): int =
   let fuelMass = calcFuel mass
 
-  if fuelMass < 0:
+  if fuelMass <= 0:
     return fullMass
 
   return calcFullFuel(fuelMass, fullMass + fuelMass)
