@@ -50,4 +50,19 @@ proc getValue(state: seq[int], address: int): int =
   return state[addressOfValue]
 
 proc solveSecond*(input: seq[string]): int =
+  let correctOutput = 19690720
+
+  var state = input.mapIt(it.parseInt)
+
+  for noun in 0..99:
+    for verb in 0..99:
+      var freshState: seq[int]
+      deepCopy(freshState, state)
+      freshState = restoreGravity(freshState, noun, verb)
+
+      result = execute(freshState, noun, verb)
+      if result == correctOutput:
+        return 100 * noun + verb
+
+  echo "answer not found for second part =("
   return -1
