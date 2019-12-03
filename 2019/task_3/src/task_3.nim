@@ -19,6 +19,7 @@ proc includesPoint(line: Line, point: Point): bool
 
 proc parseWire(input: string): seq[Line]
 proc getIntersections(firstWire, secondWire: seq[Line]): seq[Point]
+proc lengthToPoint(wire: seq[Line], intersection: Point): int
 
 when isMainModule:
   let input = readFile("input.txt").strip.splitLines
@@ -41,7 +42,36 @@ proc solveFirst*(input: seq[string]): int =
   return closestIntersection.distFromStart
 
 proc solveSecond*(input: seq[string]): int =
-  return -1
+  let firstWire = parseWire(input[0]) 
+  let secondWire = parseWire(input[1]) 
+
+  var intersections = getIntersections(firstWire, secondWire)
+
+  var minLength = firstWire.lengthToPoint(firstWire[^1].b)
+  for intersection in intersections:
+    let firstLength = firstWire.lengthToPoint(intersection)
+    let secondLength = secondWire.lengthToPoint(intersection)
+
+    let length = firstLength + secondLength
+    if length < minLength:
+      minLength = length
+
+  return minLength
+
+
+proc lengthToPoint(wire: seq[Line], point: Point): int =
+  var length = 0
+
+  for line in wire:
+    if line includesPoint point:
+      if line.isHorizontal:
+        length += Line(a: line.a, b: point).length
+      break
+    else:
+      length += line.length
+
+  return length
+
 
 proc getIntersections(firstWire, secondWire: seq[Line]): seq[Point] =
   var intersections: seq[Point]
