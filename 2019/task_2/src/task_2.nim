@@ -5,7 +5,7 @@ proc solveFirst*(input: seq[string], noun, verb: int): int
 proc solveSecond*(input: seq[string]): int
 
 proc restoreGravity(input: var seq[int], noun, verb: int): seq[int]
-proc getValue(state: seq[int], address: int): int
+proc getPtrPtrValue(state: seq[int], address: int): int
 
 when isMainModule:
   let input = readFile("input.txt").strip.split(',')
@@ -22,9 +22,9 @@ proc execute(state: var seq[int], noun, verb: int): int =
 
     case currOpcode:
       of 1:
-        state[state[currOpcodePtr + 3]] = getValue(state, currOpcodePtr+1) + getValue(state, currOpcodePtr+2)
+        state[state[currOpcodePtr + 3]] = getPtrPtrValue(state, currOpcodePtr+1) + getPtrPtrValue(state, currOpcodePtr+2)
       of 2:
-        state[state[currOpcodePtr + 3]] = getValue(state, currOpcodePtr+1) * getValue(state, currOpcodePtr+2)
+        state[state[currOpcodePtr + 3]] = getPtrPtrValue(state, currOpcodePtr+1) * getPtrPtrValue(state, currOpcodePtr+2)
       of 99:
         break
       else:
@@ -45,7 +45,7 @@ proc restoreGravity(input: var seq[int], noun, verb: int): seq[int] =
   input[2] = verb 
   return input
 
-proc getValue(state: seq[int], address: int): int =
+proc getPtrPtrValue(state: seq[int], address: int): int =
   let addressOfValue = state[address]
   return state[addressOfValue]
 
