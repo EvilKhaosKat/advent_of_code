@@ -99,11 +99,15 @@ proc includesPoint(line: Line, point: Point): bool =
 proc isHorizontal(line: Line): bool =
   return line.a.y == line.b.y
 
+proc lengthByCoor(a, b: int): int =
+  return (max(a, b) - min(a, b)).abs
+
+# TODO geometry approach is better (A^2 +
 proc length(line: Line): int =
   if line.isHorizontal:
-    return (max(line.a.x, line.b.x) - min(line.a.x, line.b.x)).abs
+    return lengthByCoor(line.a.x, line.b.x)
   else:
-    return (max(line.a.y, line.b.y) - min(line.a.y, line.b.y)).abs
+    return lengthByCoor(line.a.y, line.b.y)
 
 # TODO use ref on point
 proc getIntersection(first, second: Line): (Point, bool) =
