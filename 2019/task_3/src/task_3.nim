@@ -30,7 +30,7 @@ proc getIntersections(firstWire, secondWire: seq[Line]): seq[Point] =
   for firstLine in firstWire:
     for secondLine in secondWire:
       let (point, intersected) = firstLine.getIntersection(secondLine)
-      if intersected:
+      if intersected and point.distFromStart != 0:
         intersections.add(point) 
 
   return intersections
@@ -41,14 +41,12 @@ proc solveFirst*(input: seq[string]): int =
 
   var intersections = getIntersections(firstWire, secondWire)
 
-  var closestIntersection = Point(x: 9001, y: 9001)
+  var closestIntersection = intersections[0] 
   for intersection in intersections:
-    if intersection.distFromStart == 0:
-      continue
-
     if intersection.distFromStart < closestIntersection.distFromStart:
       closestIntersection = intersection
 
+  echo fmt"{closestIntersection.distFromStart}"
   return closestIntersection.distFromStart
 
 proc solveSecond*(input: seq[string]): int =
