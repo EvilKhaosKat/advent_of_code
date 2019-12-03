@@ -29,16 +29,11 @@ proc solveFirst*(input: seq[string]): int =
   let firstWire = parseWire(input[0]) 
   let secondWire = parseWire(input[1]) 
 
-  echo fmt"{firstWire}"
-  echo fmt"{secondWire}"
-
   var intersections: seq[Point]
 
   for firstLine in firstWire:
     for secondLine in secondWire:
       let (point, intersected) = firstLine.getIntersection(secondLine)
-      if intersected:
-        echo fmt"{point}:{intersected}"
       if intersected:
         intersections.add(point) 
 
@@ -50,13 +45,10 @@ proc solveFirst*(input: seq[string]): int =
     if intersection.distFromStart < closestIntersection.distFromStart:
       closestIntersection = intersection
 
-  echo fmt"{closestIntersection.distFromStart}"
   return closestIntersection.distFromStart
-
 
 proc solveSecond*(input: seq[string]): int =
   return -1
-
 
 proc distFromStart(point: Point): int =
   return point.x.abs + point.y.abs 
