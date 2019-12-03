@@ -24,11 +24,7 @@ when isMainModule:
   echo solveFirst(input)
   echo solveSecond(input)
 
-
-proc solveFirst*(input: seq[string]): int =
-  let firstWire = parseWire(input[0]) 
-  let secondWire = parseWire(input[1]) 
-
+proc getIntersections(firstWire, secondWire: seq[Line]): seq[Point] =
   var intersections: seq[Point]
 
   for firstLine in firstWire:
@@ -36,6 +32,14 @@ proc solveFirst*(input: seq[string]): int =
       let (point, intersected) = firstLine.getIntersection(secondLine)
       if intersected:
         intersections.add(point) 
+
+  return intersections
+
+proc solveFirst*(input: seq[string]): int =
+  let firstWire = parseWire(input[0]) 
+  let secondWire = parseWire(input[1]) 
+
+  var intersections = getIntersections(firstWire, secondWire)
 
   var closestIntersection = Point(x: 9001, y: 9001)
   for intersection in intersections:
