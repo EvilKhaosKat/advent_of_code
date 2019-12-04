@@ -12,20 +12,23 @@ proc inc(password: var Password, index: int): Password
 proc isCorrect(password: Password): bool
 proc isSame(password: Password, value: string): bool
 
+
+# TODO skip excess subranges here instead of validation func
 when isMainModule:
   let input = readFile("input.txt").strip.splitLines
 
   echo solveFirst(input)
   echo solveSecond(input)
 
+proc getPasswordAsSeq(password: string): seq[int] =
+  return @password.mapIt(parseInt($it))
+
 proc solveFirst*(input: seq[string]): int =
   let fromPassword = input[0]
   let toPassword = input[1]
 
-  var fromPasswordNumbers = @fromPassword.mapIt(($it).parseInt)
-  
   var password = Password(@[])
-  password.add(fromPasswordNumbers)
+  password.add(fromPassword.getPasswordAsSeq)
 
   var passwordsCount = 0
   while true:
@@ -40,7 +43,7 @@ proc solveFirst*(input: seq[string]): int =
   return passwordsCount
 
 proc solveSecond*(input: seq[string]): int =
-  return -1
+  return -1 
 
 proc inc(password: var Password, index: int): Password =
     if index < 0:
