@@ -96,17 +96,27 @@ proc isCorrect*(password: Password): bool =
 
 proc isCorrectPart2*(password: Password): bool =
   var hasSameAdjacentsDigits = false
-  
+  var groupSize = 1
+ 
   var prevDigit = password[0]
   for index in 1..<password.len:
     var digit = password[index]
+
     if prevDigit == digit:
-      hasSameAdjacentsDigits = true    
+      groupSize += 1
+    else:
+      if groupSize == 2:
+        hasSameAdjacentsDigits = true
+
+      groupSize = 1
 
     if digit < prevDigit:
       return false
 
     prevDigit = digit
+
+  if groupSize == 2:
+    hasSameAdjacentsDigits = true
 
   return hasSameAdjacentsDigits 
 

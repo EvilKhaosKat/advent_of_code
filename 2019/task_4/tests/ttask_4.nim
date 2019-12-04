@@ -8,3 +8,5 @@ when isMainModule:
 
   doAssert isCorrectPart2 Password(@[1, 1, 2, 2, 3, 3])
   doAssert not isCorrectPart2 Password(@[1, 2, 3, 4, 4, 4])
+  doAssert isCorrectPart2 Password(@[1, 1, 1, 1, 2, 2])
+
