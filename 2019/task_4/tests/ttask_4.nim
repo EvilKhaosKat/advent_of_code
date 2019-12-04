@@ -1,6 +1,10 @@
 import ../src/task_4
-import strutils, strformat
+import strutils, strformat 
 
 when isMainModule:
-  doAssert solveFirst(@["R8,U5,L5,D3", "U7,R6,D4,L4"]) == 6
+  doAssert isCorrect Password(@[1, 1, 1, 1, 1, 1])
+  doAssert not isCorrect Password(@[2, 2, 3, 4, 5, 0])
+  doAssert not isCorrect Password(@[1, 2, 3, 7, 8, 9])
 
+  doAssert isCorrectPart2 Password(@[1, 1, 2, 2, 3, 3])
+  doAssert not isCorrectPart2 Password(@[1, 2, 3, 4, 4, 4])

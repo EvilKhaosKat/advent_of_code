@@ -5,11 +5,12 @@ proc solveFirst*(input: seq[string]): int
 proc solveSecond*(input: seq[string]): int
 
 type
-  Password = seq[int]
+  Password* = seq[int]
 
  
 proc inc(password: var Password, index: int): Password
-proc isCorrect(password: Password): bool
+proc isCorrect*(password: Password): bool
+proc isCorrectPart2*(password: Password): bool
 proc isSame(password: Password, value: string): bool
 
 
@@ -43,7 +44,23 @@ proc solveFirst*(input: seq[string]): int =
   return passwordsCount
 
 proc solveSecond*(input: seq[string]): int =
-  return -1 
+  let fromPassword = input[0]
+  let toPassword = input[1]
+
+  var password = Password(@[])
+  password.add(fromPassword.getPasswordAsSeq)
+
+  var passwordsCount = 0
+  while true:
+    password = password.inc(password.len - 1)
+
+    if password.isSame(toPassword):
+      break
+
+    if password.isCorrectPart2:
+      passwordsCount+= 1
+
+  return passwordsCount
 
 proc inc(password: var Password, index: int): Password =
     if index < 0:
@@ -61,7 +78,23 @@ proc inc(password: var Password, index: int): Password =
 
     return password
 
-proc isCorrect(password: Password): bool =
+proc isCorrect*(password: Password): bool =
+  var hasSameAdjacentsDigits = false
+  
+  var prevDigit = password[0]
+  for index in 1..<password.len:
+    var digit = password[index]
+    if prevDigit == digit:
+      hasSameAdjacentsDigits = true    
+
+    if digit < prevDigit:
+      return false
+
+    prevDigit = digit
+
+  return hasSameAdjacentsDigits 
+
+proc isCorrectPart2*(password: Password): bool =
   var hasSameAdjacentsDigits = false
   
   var prevDigit = password[0]
