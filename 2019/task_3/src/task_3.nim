@@ -4,7 +4,7 @@ import math, strutils, strformat, sequtils
 proc solveFirst*(input: seq[string]): int
 proc solveSecond*(input: seq[string]): int
 
-type 
+type
   Point = object
     x, y: int
 
@@ -28,12 +28,12 @@ when isMainModule:
   echo solveSecond(input)
 
 proc solveFirst*(input: seq[string]): int =
-  let firstWire = parseWire(input[0]) 
-  let secondWire = parseWire(input[1]) 
+  let firstWire = parseWire(input[0])
+  let secondWire = parseWire(input[1])
 
   var intersections = getIntersections(firstWire, secondWire)
 
-  var closestIntersection = intersections[0] 
+  var closestIntersection = intersections[0]
   for intersection in intersections:
     if intersection.distFromStart < closestIntersection.distFromStart:
       closestIntersection = intersection
@@ -41,8 +41,8 @@ proc solveFirst*(input: seq[string]): int =
   return closestIntersection.distFromStart
 
 proc solveSecond*(input: seq[string]): int =
-  let firstWire = parseWire(input[0]) 
-  let secondWire = parseWire(input[1]) 
+  let firstWire = parseWire(input[0])
+  let secondWire = parseWire(input[1])
 
   var intersections = getIntersections(firstWire, secondWire)
 
@@ -67,7 +67,7 @@ proc lengthToPoint(wire: seq[Line], point: Point): int =
       break
     else:
       length += line.length
-  
+
   return length
 
 
@@ -78,12 +78,12 @@ proc getIntersections(firstWire, secondWire: seq[Line]): seq[Point] =
     for secondLine in secondWire:
       let (point, intersected) = firstLine.getIntersection(secondLine)
       if intersected and point.distFromStart != 0:
-        intersections.add(point) 
+        intersections.add(point)
 
   return intersections
 
 proc distFromStart(point: Point): int =
-  return point.x.abs + point.y.abs 
+  return point.x.abs + point.y.abs
 
 proc includesPoint(line: Line, point: Point): bool =
   let aX = line.a.x
@@ -125,13 +125,13 @@ proc getIntersection(first, second: Line): (Point, bool) =
 
   let point = Point(x: x, y: y)
   return (point, first.includesPoint(point) and second.includesPoint(point))
-  
+
 proc parseWire(input: string): seq[Line] =
   let commands = input.split(',')
 
   var lines: seq[Line]
 
-  var currPoint = Point(x:0 , y: 0)
+  var currPoint = Point(x: 0, y: 0)
 
   for command in commands:
     let commandType = command[0]
@@ -140,18 +140,18 @@ proc parseWire(input: string): seq[Line] =
     var targetPoint: Point
     case commandType:
       of 'U':
-        targetPoint = Point(x: currPoint.x, y: currPoint.y - dist) 
+        targetPoint = Point(x: currPoint.x, y: currPoint.y - dist)
       of 'R':
-        targetPoint = Point(x: currPoint.x + dist, y:currPoint.y) 
+        targetPoint = Point(x: currPoint.x + dist, y: currPoint.y)
       of 'D':
-        targetPoint = Point(x: currPoint.x, y: currPoint.y + dist) 
+        targetPoint = Point(x: currPoint.x, y: currPoint.y + dist)
       of 'L':
-        targetPoint = Point(x: currPoint.x - dist, y: currPoint.y) 
+        targetPoint = Point(x: currPoint.x - dist, y: currPoint.y)
       else:
         echo fmt"unknown command type {commandType}"
 
     lines.add(Line(a: Point(x: currPoint.x, y: currPoint.y), b: targetPoint))
 
     currPoint = targetPoint
-      
+
   return lines
