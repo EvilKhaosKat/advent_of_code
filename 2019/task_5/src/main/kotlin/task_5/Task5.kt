@@ -91,7 +91,7 @@ class Task5 {
     }
 
     fun MutableList<Int>.opcodeSaveTo(ptr: Int, input: Int): Int {
-        val resultPtr = Mode.POSITION.get(this, ptr + 1)
+        val resultPtr = Mode.IMMEDIATE.get(this, ptr + 1)
 
         this[resultPtr] = input
 
@@ -99,7 +99,7 @@ class Task5 {
     }
 
     fun MutableList<Int>.opcodeGetFrom(ptr: Int): Pair<Int, Int> {
-        val resultPtr = Mode.POSITION.get(this, ptr + 1)
+        val resultPtr = Mode.IMMEDIATE.get(this, ptr + 1)
 
         return Pair(this[resultPtr], 2)
     }
