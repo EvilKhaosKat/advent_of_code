@@ -8,6 +8,7 @@ type
   Password* = seq[int]
 
  
+proc inc(password: var Password): Password
 proc inc(password: var Password, index: int): Password
 proc isCorrect*(password: Password): bool
 proc isCorrectPart2*(password: Password): bool
@@ -28,12 +29,11 @@ proc solveFirst*(input: seq[string]): int =
   let fromPassword = input[0]
   let toPassword = input[1]
 
-  var password = Password(@[])
-  password.add(fromPassword.getPasswordAsSeq)
+  var password = Password(fromPassword.getPasswordAsSeq)
 
   var passwordsCount = 0
   while true:
-    password = password.inc(password.len - 1)
+    password = password.inc()
 
     if password.isSame(toPassword):
       break
@@ -47,12 +47,11 @@ proc solveSecond*(input: seq[string]): int =
   let fromPassword = input[0]
   let toPassword = input[1]
 
-  var password = Password(@[])
-  password.add(fromPassword.getPasswordAsSeq)
+  var password = Password(fromPassword.getPasswordAsSeq)
 
   var passwordsCount = 0
   while true:
-    password = password.inc(password.len - 1)
+    password = password.inc()
 
     if password.isSame(toPassword):
       break
@@ -61,6 +60,9 @@ proc solveSecond*(input: seq[string]): int =
       passwordsCount+= 1
 
   return passwordsCount
+
+proc inc(password: var Password): Password = 
+  return password.inc(password.len - 1)
 
 proc inc(password: var Password, index: int): Password =
     if index < 0:
