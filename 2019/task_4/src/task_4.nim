@@ -23,7 +23,7 @@ when isMainModule:
   echo solveSecond(input)
 
 proc getPasswordAsSeq(password: string): seq[int] =
-  return @password.mapIt(parseInt($it))
+  return password.toSeq().mapIt(parseInt($it))
 
 proc solveFirst*(input: seq[string]): int =
   let fromPassword = input[0]
@@ -71,12 +71,10 @@ proc inc(password: var Password, index: int): Password =
 
     var val = password[index]
     if val == 9:
-      val = 0
-      password[index] = val
+      password[index] = 0 
       return password.inc(index - 1)
     else:
-      val += 1
-      password[index] = val
+      password[index] = val + 1
 
     return password
 
@@ -124,4 +122,3 @@ proc isCorrectPart2*(password: Password): bool =
 
 proc isSame(password: Password, value: string): bool =
   return password.join  == value
-
