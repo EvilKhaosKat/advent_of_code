@@ -121,4 +121,4 @@ proc isCorrectPart2*(password: Password): bool =
   return hasSameAdjacentsDigits 
 
 proc isSame(password: Password, value: string): bool =
-  return password.join  == value
+  return password.join == value
