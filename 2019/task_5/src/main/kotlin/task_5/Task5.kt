@@ -26,9 +26,9 @@ class Task5 {
 
             if (num.specifiesParamMode()) {
                 val parameterModes = num.toString()
-                opcode = parameterModes[3].toString().toInt()
-                firstOperandMode = Mode.of(parameterModes[1])
-                secondOperandMode = Mode.of(parameterModes[0])
+                opcode = parameterModes[parameterModes.length - 1].toString().toInt()
+                firstOperandMode = getOperandMode(parameterModes, parameterModes.length - 3)
+                secondOperandMode = getOperandMode(parameterModes, parameterModes.length - 4)
             }
 
             when (opcode) {
@@ -47,7 +47,6 @@ class Task5 {
                     ptrInc = result.second
                 }
                 99 -> {
-                    println("Finished")
                     finished = true
                 }
                 else -> {
@@ -66,8 +65,16 @@ class Task5 {
         return -1
     }
 
+    private fun getOperandMode(parameterModes: String, index: Int): Mode {
+        return if (index < 0) {
+            Mode.POSITION
+        } else {
+            Mode.of(parameterModes[index])
+        }
+    }
+
     fun Int.specifiesParamMode(): Boolean {
-        return this > 1000
+        return this > 99
     }
 
     fun MutableList<Int>.opcodeAdd(ptr: Int, firstOperand: Mode, secondOperand: Mode): Int {
@@ -104,6 +111,39 @@ class Task5 {
         return Pair(this[resultPtr], 2)
     }
 
+    fun MutableList<Int>.opcodeJumpIfTrue(ptr: Int, firstOperand: Mode, secondOperand: Mode): Int {
+        val first = firstOperand.get(this, ptr + 1)
+        val second = secondOperand.get(this, ptr + 2)
+
+        return if (first != 0) {
+            second
+        } else {
+            ptr + 3
+        }
+    }
+
+    fun MutableList<Int>.opcodeJumpIfFalse(ptr: Int, firstOperand: Mode, secondOperand: Mode): Int {
+        val first = firstOperand.get(this, ptr + 1)
+        val second = secondOperand.get(this, ptr + 2)
+
+        return if (first == 0) {
+            second
+        } else {
+            ptr + 3
+        }
+    }
+
+    fun MutableList<Int>.opcodeJumpIfLessThan(ptr: Int, firstOperand: Mode, secondOperand: Mode): Int {
+        val first = firstOperand.get(this, ptr + 1)
+        val second = secondOperand.get(this, ptr + 2)
+
+        return if (first != 0) {
+            second
+        } else {
+            ptr + 3
+        }
+    }
+
     private fun getStateByInput(input: String) = input.split(',').map { it.toInt() }.toMutableList()
 }
 
@@ -136,7 +176,6 @@ fun main() {
     val task5 = Task5()
     val input = File("input.txt").readLines()[0]
 
-//    print(task5.solveFirst("1002,4,3,4,33,99"))
-    print(task5.solveFirst(input))
-    print(task5.solveSecond(input))
+    println(task5.solveFirst(input))
+    println(task5.solveSecond(input))
 }
