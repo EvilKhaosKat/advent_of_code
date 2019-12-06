@@ -5,12 +5,12 @@ package task_6
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
 
 class AppTest {
     @Test
-    fun testAppHasAGreeting() {
+    fun testFirstPart() {
         val app = App()
+
         assertEquals(42, app.solveFirst(listOf(
                 "COM)B",
                 "B)C",
@@ -23,6 +23,27 @@ class AppTest {
                 "E)J",
                 "J)K",
                 "K)L"
+        )))
+    }
+
+    @Test
+    fun testSecondPart() {
+        val app = App()
+
+        assertEquals(4, app.solveSecond(listOf(
+                "COM)B",
+                "B)C",
+                "C)D",
+                "D)E",
+                "E)F",
+                "B)G",
+                "G)H",
+                "D)I",
+                "E)J",
+                "J)K",
+                "K)L",
+                "K)YOU",
+                "I)SAN"
         )))
     }
 }

@@ -11,22 +11,36 @@ import kotlin.collections.HashMap
 class App {
     //308143 is not right
     fun solveFirst(input: List<String>): Int {
-        val objects = HashMap<String, Node>()
+        val (com, _) = getOrbitsTree(input)
+        return getTotalOrbits(com)
+    }
+
+    fun solveSecond(input: List<String>): Int {
+        val (_, orbits) = getOrbitsTree(input)
+
+        val you = orbits.getValue("YOU")
+        val san = orbits.getValue("SAN")
+
+        return getTransfersCount(you, san)
+    }
+
+    private fun getOrbitsTree(input: List<String>): Pair<Node, Map<String, Node>> {
+        val orbits = HashMap<String, Node>()
 
         for (line in input) {
             val parts = line.split(")")
 
             val parentName = parts[0]
-            val parent = objects.getNode(parentName)
+            val parent = orbits.getNode(parentName)
 
             val childName = parts[1]
-            val child = objects.getNode(childName)
+            val child = orbits.getNode(childName)
 
             append(parent, child)
         }
 
-        val com = objects.getValue("COM")
-        return getTotalOrbits(com)
+        val com = orbits.getValue("COM")
+        return Pair(com, orbits)
     }
 
     private fun getTotalOrbits(root: Node): Int {
@@ -45,7 +59,36 @@ class App {
         return result
     }
 
-    fun solveSecond(input: List<String>): Int {
+    private fun getTransfersCount(you: Node, san: Node): Int {
+        val from = you.parent!!
+        val to = san.parent!!
+
+        val visitedNodes = mutableSetOf<Node>()
+
+        val nodesToVisit = Stack<Pair<Node, Int>>()
+        nodesToVisit.push(Pair(from, 0))
+
+        while (nodesToVisit.isNotEmpty()) {
+            val (node, level) = nodesToVisit.pop()
+
+            if (visitedNodes.contains(node)) {
+                continue
+            }
+
+            visitedNodes.add(node)
+
+            if (node == to) {
+                return level
+            }
+
+            nodesToVisit.addAll(node.children.map { Pair(it, level + 1) })
+
+            val parent = node.parent
+            if (parent != null) {
+                nodesToVisit.add(Pair(parent, level + 1))
+            }
+        }
+
         return -1
     }
 
@@ -66,7 +109,22 @@ class App {
     }
 }
 
-data class Node(val name: String, var parent: Node?, val children: MutableList<Node>)
+data class Node(val name: String, var parent: Node?, val children: MutableList<Node>) {
+    override fun hashCode(): Int {
+        return Objects.hash(name)
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Node
+
+        if (name != other.name) return false
+
+        return true
+    }
+}
 
 fun main() {
     val app = App()
