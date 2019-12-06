@@ -1,6 +1,7 @@
 import ../src/task_4
 import strutils, strformat
 
+
 when isMainModule:
   doAssert isCorrectPart1 Password(@[1, 1, 1, 1, 1, 1])
   doAssert not isCorrectPart1 Password(@[2, 2, 3, 4, 5, 0])

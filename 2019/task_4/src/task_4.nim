@@ -1,4 +1,4 @@
-import strutils, strformat, sequtils
+import sugar, strutils, strformat, sequtils
 
 
 proc solveFirst*(input: seq[string]): int
@@ -25,7 +25,7 @@ when isMainModule:
 proc getPasswordAsSeq(password: string): seq[int] =
   return password.toSeq().mapIt(parseInt($it))
 
-proc solve(input: seq[string], isCorrect: proc (password: Password): bool): int =
+proc solve(input: seq[string], isCorrect: (password: Password) -> bool): int =
   let fromPassword = input[0]
   let toPassword = input[1]
 
