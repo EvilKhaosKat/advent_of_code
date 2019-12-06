@@ -1,4 +1,4 @@
-import math, strutils, strformat, sequtils
+import strutils, strformat, sequtils
 
 
 proc solveFirst*(input: seq[string]): int
@@ -10,7 +10,7 @@ type
 
 proc inc(password: var Password): Password
 proc inc(password: var Password, index: int): Password
-proc isCorrect*(password: Password): bool
+proc isCorrectPart1*(password: Password): bool
 proc isCorrectPart2*(password: Password): bool
 proc isSame(password: Password, value: string): bool
 
@@ -25,7 +25,7 @@ when isMainModule:
 proc getPasswordAsSeq(password: string): seq[int] =
   return password.toSeq().mapIt(parseInt($it))
 
-proc solveFirst*(input: seq[string]): int =
+proc solve(input: seq[string], isCorrect: proc (password: Password): bool): int =
   let fromPassword = input[0]
   let toPassword = input[1]
 
@@ -38,28 +38,16 @@ proc solveFirst*(input: seq[string]): int =
     if password.isSame(toPassword):
       break
 
-    if password.isCorrect:
+    if isCorrect(password):
       passwordsCount += 1
 
   return passwordsCount
+
+proc solveFirst*(input: seq[string]): int =
+  return solve(input, isCorrectPart1) 
 
 proc solveSecond*(input: seq[string]): int =
-  let fromPassword = input[0]
-  let toPassword = input[1]
-
-  var password = Password(fromPassword.getPasswordAsSeq)
-
-  var passwordsCount = 0
-  while true:
-    password = password.inc()
-
-    if password.isSame(toPassword):
-      break
-
-    if password.isCorrectPart2:
-      passwordsCount += 1
-
-  return passwordsCount
+  return solve(input, isCorrectPart2) 
 
 proc inc(password: var Password): Password =
   return password.inc(password.len - 1)
@@ -78,7 +66,7 @@ proc inc(password: var Password, index: int): Password =
 
   return password
 
-proc isCorrect*(password: Password): bool =
+proc isCorrectPart1*(password: Password): bool =
   var hasSameAdjacentsDigits = false
 
   var prevDigit = password[0]
