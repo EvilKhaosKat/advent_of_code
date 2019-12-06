@@ -1,5 +1,5 @@
 import ../src/task_4
-import strutils, strformat 
+import strutils, strformat
 
 when isMainModule:
   doAssert isCorrect Password(@[1, 1, 1, 1, 1, 1])
