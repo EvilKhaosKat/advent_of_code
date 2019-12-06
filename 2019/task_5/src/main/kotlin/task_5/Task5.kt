@@ -8,9 +8,16 @@ import java.lang.RuntimeException
 
 class Task5 {
     fun solveFirst(input: String): Int {
+        return solve(input, 1)
+    }
+
+    fun solveSecond(input: String): Int {
+        return solve(input, 5)
+    }
+
+    fun solve(input: String, inputValue: Int): Int {
         val state = getStateByInput(input)
 
-        val inputValue = 1
         var outputValue = 0
 
         var ptr = 0
@@ -23,12 +30,14 @@ class Task5 {
             var opcode = num
             var firstOperandMode = Mode.POSITION
             var secondOperandMode = Mode.POSITION
+            var thirdOperandMode = Mode.POSITION
 
             if (num.specifiesParamMode()) {
                 val parameterModes = num.toString()
                 opcode = parameterModes[parameterModes.length - 1].toString().toInt()
                 firstOperandMode = getOperandMode(parameterModes, parameterModes.length - 3)
                 secondOperandMode = getOperandMode(parameterModes, parameterModes.length - 4)
+                thirdOperandMode = getOperandMode(parameterModes, parameterModes.length - 5)
             }
 
             when (opcode) {
@@ -46,6 +55,20 @@ class Task5 {
                     outputValue = result.first
                     ptrInc = result.second
                 }
+                5 -> {
+                    ptr = state.opcodeJumpIfTrue(ptr, firstOperandMode, secondOperandMode)
+                    ptrInc = 0
+                }
+                6 -> {
+                    ptr = state.opcodeJumpIfFalse(ptr, firstOperandMode, secondOperandMode)
+                    ptrInc = 0
+                }
+                7 -> {
+                    ptrInc = state.opcodeLessThan(ptr, firstOperandMode, secondOperandMode, thirdOperandMode)
+                }
+                8 -> {
+                    ptrInc = state.opcodeEquals(ptr, firstOperandMode, secondOperandMode, thirdOperandMode)
+                }
                 99 -> {
                     finished = true
                 }
@@ -59,10 +82,6 @@ class Task5 {
         }
 
         return outputValue
-    }
-
-    fun solveSecond(input: String): Int {
-        return -1
     }
 
     private fun getOperandMode(parameterModes: String, index: Int): Mode {
@@ -133,15 +152,24 @@ class Task5 {
         }
     }
 
-    fun MutableList<Int>.opcodeJumpIfLessThan(ptr: Int, firstOperand: Mode, secondOperand: Mode): Int {
+    fun MutableList<Int>.opcodeLessThan(ptr: Int, firstOperand: Mode, secondOperand: Mode, thirdOperandMode: Mode): Int {
         val first = firstOperand.get(this, ptr + 1)
         val second = secondOperand.get(this, ptr + 2)
+        val resultPtr = Mode.IMMEDIATE.get(this, ptr + 3)
 
-        return if (first != 0) {
-            second
-        } else {
-            ptr + 3
-        }
+        this[resultPtr] = if (first < second) 1 else 0
+
+        return 4
+    }
+
+    fun MutableList<Int>.opcodeEquals(ptr: Int, firstOperand: Mode, secondOperand: Mode, thirdOperandMode: Mode): Int {
+        val first = firstOperand.get(this, ptr + 1)
+        val second = secondOperand.get(this, ptr + 2)
+        val resultPtr = Mode.IMMEDIATE.get(this, ptr + 3)
+
+        this[resultPtr] = if (first == second) 1 else 0
+
+        return 4
     }
 
     private fun getStateByInput(input: String) = input.split(',').map { it.toInt() }.toMutableList()
