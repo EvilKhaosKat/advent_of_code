@@ -1,18 +1,20 @@
-package task_5
+package task_7
 
 import java.io.File
 import java.lang.RuntimeException
 
-class Task5 {
+class App {
     fun solveFirst(input: String): Int {
-        return solve(input, 1)
+        return -1
     }
 
     fun solveSecond(input: String): Int {
-        return solve(input, 5)
+        return -1
     }
+}
 
-    fun solve(input: String, inputValue: Int): Int {
+class IntcodeComputer {
+    fun solve(input: String, inputValues: MutableList<Int>): Int {
         val state = getStateByInput(input)
 
         var outputValue = 0
@@ -45,7 +47,8 @@ class Task5 {
                     ptrInc = state.opcodeMult(ptr, firstOperandMode, secondOperandMode)
                 }
                 3 -> {
-                    ptrInc = state.opcodeSaveTo(ptr, inputValue)
+                    ptrInc = state.opcodeSaveTo(ptr, inputValues[0])
+                    inputValues.removeAt(0)
                 }
                 4 -> {
                     val result = state.opcodeGetFrom(ptr, firstOperandMode)
@@ -196,11 +199,10 @@ enum class Mode {
 fun List<Int>.getPositionMode(index: Int): Int = this[this[index]]
 fun List<Int>.getImmediateMode(index: Int): Int = this[index]
 
-
 fun main() {
-    val task5 = Task5()
+    val app = App()
     val input = File("input.txt").readLines()[0]
 
-    println(task5.solveFirst(input))
-    println(task5.solveSecond(input))
+    println(app.solveFirst(input))
+    println(app.solveSecond(input))
 }
