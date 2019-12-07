@@ -3,7 +3,7 @@ package task_7
 import java.io.File
 import java.lang.RuntimeException
 
-//Lets try simple hardcode solution
+//Lets try simple hardcoded solution
 class App {
     fun solveFirst(input: String): Int {
         var maxThruster = 0
@@ -13,8 +13,7 @@ class App {
                 for (cPhase in 0..4) {
                     for (dPhase in 0..4) {
                         for (ePhase in 0..4) {
-                            //not optimal to do it here, but simple
-                            if (setOf(aPhase, bPhase, cPhase, dPhase, ePhase).size < 5) {
+                            if (isCorrectPhaseSettings(aPhase, bPhase, cPhase, dPhase, ePhase)) {
                                 continue
                             }
 
@@ -44,7 +43,7 @@ class App {
                 for (cPhase in 5..9) {
                     for (dPhase in 5..9) {
                         for (ePhase in 5..9) {
-                            if (setOf(aPhase, bPhase, cPhase, dPhase, ePhase).size < 5) {
+                            if (isCorrectPhaseSettings(aPhase, bPhase, cPhase, dPhase, ePhase)) {
                                 continue
                             }
 
@@ -85,12 +84,17 @@ class App {
 
         return maxThruster
     }
+
+    private fun isCorrectPhaseSettings(aPhase: Int, bPhase: Int, cPhase: Int, dPhase: Int, ePhase: Int) =
+            setOf(aPhase, bPhase, cPhase, dPhase, ePhase).size < 5
 }
 
 class IntcodeComputer(input: String) {
     var isHalt = false
+
     private var state = getStateByInput(input)
     private var ptr = 0
+
     private var inputValues = mutableListOf<Int>()
     private var outputValue = 0
 
@@ -110,14 +114,12 @@ class IntcodeComputer(input: String) {
             var opcode = num
             var firstOperandMode = Mode.POSITION
             var secondOperandMode = Mode.POSITION
-            var thirdOperandMode = Mode.POSITION
 
             if (num.specifiesParamMode()) {
                 val parameterModes = num.toString()
                 opcode = parameterModes[parameterModes.length - 1].toString().toInt()
                 firstOperandMode = getOperandMode(parameterModes, parameterModes.length - 3)
                 secondOperandMode = getOperandMode(parameterModes, parameterModes.length - 4)
-                thirdOperandMode = getOperandMode(parameterModes, parameterModes.length - 5)
             }
 
             when (opcode) {
@@ -134,8 +136,8 @@ class IntcodeComputer(input: String) {
                     val result = state.opcodeGetFrom(ptr, firstOperandMode)
                     outputValue = result.first
                     ptrInc = result.second
+
                     if (stopAtOutput) finished = true
-//                    println("output: $outputValue")
                 }
                 5 -> {
                     ptr = state.opcodeJumpIfTrue(ptr, firstOperandMode, secondOperandMode)
@@ -152,10 +154,8 @@ class IntcodeComputer(input: String) {
                     ptrInc = state.opcodeEquals(ptr, firstOperandMode, secondOperandMode)
                 }
                 99 -> {
-                    finished = true
                     isHalt = true
                     ptr = 0
-//                    println("halt!")
                 }
                 else -> {
                     println("unknown value of $num")
@@ -163,7 +163,7 @@ class IntcodeComputer(input: String) {
             }
 
             ptr += ptrInc
-            if (finished) break
+            if (finished || isHalt) break
         }
 
         return outputValue
@@ -172,9 +172,7 @@ class IntcodeComputer(input: String) {
     private fun getInput(inputValues: MutableList<Int>): Int {
         val result = inputValues[0]
 
-//        if (inputValues.size > 1) {
-            inputValues.removeAt(0)
-//        }
+        inputValues.removeAt(0)
 
         return result
     }

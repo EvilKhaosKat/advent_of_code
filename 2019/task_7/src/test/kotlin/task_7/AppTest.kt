@@ -1,19 +1,9 @@
 package task_7
 
-import org.junit.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class AppTest {
-    @Test
-    fun testFirstPart() {
-        val app = App()
-
-        assertEquals(43210, app.solveFirst("3,15,3,16,1002,16,10,16,1,16,15,15,4,15,99,0,0"))
-        assertEquals(54321, app.solveFirst("3,23,3,24,1002,24,10,24,1002,23,-1,23," +
-                "101,5,23,23,1,24,23,23,4,23,99,0,0"))
-    }
-
     @Test
     fun testIntcodeComputer() {
         val input = "3,21,1008,21,8,20,1005,20,22,107,8,21,20,1006,20,31," +
@@ -28,6 +18,15 @@ class AppTest {
         assertEquals(999, IntcodeComputer(input).addInput(1).solve())
         assertEquals(1000, IntcodeComputer(input).addInput(8).solve())
         assertEquals(1001, IntcodeComputer(input).addInput(42).solve())
+    }
+
+    @Test
+    fun testFirstPart() {
+        val app = App()
+
+        assertEquals(43210, app.solveFirst("3,15,3,16,1002,16,10,16,1,16,15,15,4,15,99,0,0"))
+        assertEquals(54321, app.solveFirst("3,23,3,24,1002,24,10,24,1002,23,-1,23," +
+                "101,5,23,23,1,24,23,23,4,23,99,0,0"))
     }
 
     @Test
