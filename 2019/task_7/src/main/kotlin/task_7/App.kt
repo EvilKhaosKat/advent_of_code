@@ -8,23 +8,23 @@ class App {
     fun solveFirst(input: String): Int {
         var maxThruster = 0
 
-        val intcodeComputer = IntcodeComputer()
-
         for (aPhase in 0..4) {
-            val aOutput = intcodeComputer.solve(input, mutableListOf(aPhase, 0))
             for (bPhase in 0..4) {
-                val bOutput = intcodeComputer.solve(input, mutableListOf(bPhase, aOutput))
                 for (cPhase in 0..4) {
-                    val cOutput = intcodeComputer.solve(input, mutableListOf(cPhase, bOutput))
                     for (dPhase in 0..4) {
-                        val dOutput = intcodeComputer.solve(input, mutableListOf(dPhase, cOutput))
                         for (ePhase in 0..4) {
-                            val eOutput = intcodeComputer.solve(input, mutableListOf(ePhase, dOutput))
-
                             //not optimal to do it here, but simple
                             if (setOf(aPhase, bPhase, cPhase, dPhase, ePhase).size < 5) {
                                 continue
                             }
+
+                            val aOutput = IntcodeComputer(input).addInput(aPhase, 0).solve()
+                            val bOutput = IntcodeComputer(input).addInput(bPhase, aOutput).solve()
+                            val cOutput = IntcodeComputer(input).addInput(cPhase, bOutput).solve()
+                            val dOutput = IntcodeComputer(input).addInput(dPhase, cOutput).solve()
+                            val eOutput = IntcodeComputer(input).addInput(ePhase, dOutput).solve()
+
+//                            println("$aPhase,$bPhase,$cPhase,$dPhase,$ePhase")
 
                             if (eOutput > maxThruster) {
                                 maxThruster = eOutput
@@ -39,21 +39,72 @@ class App {
     }
 
     fun solveSecond(input: String): Int {
-        return -1
+        var maxThruster = 0
+
+        val intcodeComputerA = IntcodeComputer(input)
+        val intcodeComputerB = IntcodeComputer(input)
+        val intcodeComputerC = IntcodeComputer(input)
+        val intcodeComputerD = IntcodeComputer(input)
+        val intcodeComputerE = IntcodeComputer(input)
+
+        for (aPhase in 5..9) {
+            for (bPhase in 5..9) {
+                for (cPhase in 5..9) {
+                    for (dPhase in 5..9) {
+                        for (ePhase in 5..9) {
+                            if (setOf(aPhase, bPhase, cPhase, dPhase, ePhase).size < 5) {
+                                continue
+                            }
+
+                            if (aPhase > 8) {
+                                println("$aPhase,$bPhase,$cPhase,$dPhase,$ePhase")
+                            }
+
+                            var aOutput = intcodeComputerA.addInput(aPhase, 0).solve()
+                            var bOutput = intcodeComputerB.addInput(bPhase, aOutput).solve()
+                            var cOutput = intcodeComputerC.addInput(cPhase, bOutput).solve()
+                            var dOutput = intcodeComputerD.addInput(dPhase, cOutput).solve()
+                            var eOutput = intcodeComputerE.addInput(ePhase, dOutput).solve()
+
+                            while (!intcodeComputerE.isHalt) {
+                                aOutput = intcodeComputerA.addInput(eOutput).solve()
+                                bOutput = intcodeComputerB.addInput(aOutput).solve()
+                                cOutput = intcodeComputerC.addInput(bOutput).solve()
+                                dOutput = intcodeComputerD.addInput(cOutput).solve()
+                                eOutput = intcodeComputerE.addInput(dOutput).solve()
+
+                                if (eOutput > maxThruster) {
+                                    maxThruster = eOutput
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return maxThruster
     }
 }
 
-class IntcodeComputer {
-    fun solve(input: String, inputValues: MutableList<Int>): Int {
-        val state = getStateByInput(input)
+class IntcodeComputer(input: String) {
+    var isHalt = false
+    private var state = getStateByInput(input)
+    private var ptr = 0
+    private var inputValues = mutableListOf<Int>()
+    private var outputValue = 0
 
-        var outputValue = 0
+    fun addInput(vararg input: Int): IntcodeComputer {
+        input.forEach { inputValues.add(it) }
+        return this
+    }
 
-        var ptr = 0
+    fun solve(): Int {
         var ptrInc = 0
 
         while (true) {
             var finished = false
+            isHalt = false
             val num = state[ptr]
 
             var opcode = num
@@ -77,13 +128,14 @@ class IntcodeComputer {
                     ptrInc = state.opcodeMult(ptr, firstOperandMode, secondOperandMode)
                 }
                 3 -> {
-                    ptrInc = state.opcodeSaveTo(ptr, inputValues[0])
-                    inputValues.removeAt(0)
+                    ptrInc = state.opcodeSaveTo(ptr, getInput(inputValues))
                 }
                 4 -> {
                     val result = state.opcodeGetFrom(ptr, firstOperandMode)
                     outputValue = result.first
                     ptrInc = result.second
+                    finished = true
+//                    println("output: $outputValue")
                 }
                 5 -> {
                     ptr = state.opcodeJumpIfTrue(ptr, firstOperandMode, secondOperandMode)
@@ -101,17 +153,29 @@ class IntcodeComputer {
                 }
                 99 -> {
                     finished = true
+                    isHalt = true
+//                    println("halt!")
                 }
                 else -> {
                     println("unknown value of $num")
                 }
             }
 
-            if (finished) break
             ptr += ptrInc
+            if (finished) break
         }
 
         return outputValue
+    }
+
+    private fun getInput(inputValues: MutableList<Int>): Int {
+        val result = inputValues[0]
+
+        if (inputValues.size > 1) {
+            inputValues.removeAt(0)
+        }
+
+        return result
     }
 
     private fun getOperandMode(parameterModes: String, index: Int): Mode {
@@ -185,7 +249,7 @@ class IntcodeComputer {
     fun MutableList<Int>.opcodeLessThan(ptr: Int, firstOperand: Mode, secondOperand: Mode, thirdOperandMode: Mode): Int {
         val first = firstOperand.get(this, ptr + 1)
         val second = secondOperand.get(this, ptr + 2)
-        val resultPtr = Mode.IMMEDIATE.get(this, ptr + 3)
+        val resultPtr = thirdOperandMode.get(this, ptr + 3)
 
         this[resultPtr] = if (first < second) 1 else 0
 
@@ -195,7 +259,7 @@ class IntcodeComputer {
     fun MutableList<Int>.opcodeEquals(ptr: Int, firstOperand: Mode, secondOperand: Mode, thirdOperandMode: Mode): Int {
         val first = firstOperand.get(this, ptr + 1)
         val second = secondOperand.get(this, ptr + 2)
-        val resultPtr = Mode.IMMEDIATE.get(this, ptr + 3)
+        val resultPtr = thirdOperandMode.get(this, ptr + 3)
 
         this[resultPtr] = if (first == second) 1 else 0
 
