@@ -3,9 +3,39 @@ package task_7
 import java.io.File
 import java.lang.RuntimeException
 
+//Lets try simple hardcode solution
 class App {
     fun solveFirst(input: String): Int {
-        return -1
+        var maxThruster = 0
+
+        val intcodeComputer = IntcodeComputer()
+
+        for (aPhase in 0..4) {
+            val aOutput = intcodeComputer.solve(input, mutableListOf(aPhase, 0))
+            for (bPhase in 0..4) {
+                val bOutput = intcodeComputer.solve(input, mutableListOf(bPhase, aOutput))
+                for (cPhase in 0..4) {
+                    val cOutput = intcodeComputer.solve(input, mutableListOf(cPhase, bOutput))
+                    for (dPhase in 0..4) {
+                        val dOutput = intcodeComputer.solve(input, mutableListOf(dPhase, cOutput))
+                        for (ePhase in 0..4) {
+                            val eOutput = intcodeComputer.solve(input, mutableListOf(ePhase, dOutput))
+
+                            //not optimal to do it here, but simple
+                            if (setOf(aPhase, bPhase, cPhase, dPhase, ePhase).size < 5) {
+                                continue
+                            }
+
+                            if (eOutput > maxThruster) {
+                                maxThruster = eOutput
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return maxThruster
     }
 
     fun solveSecond(input: String): Int {

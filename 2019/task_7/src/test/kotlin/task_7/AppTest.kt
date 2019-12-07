@@ -4,8 +4,12 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class AppTest {
-    @Test fun testAppHasAGreeting() {
-        val classUnderTest = App()
+    @Test fun testApp() {
+        val app = App()
+
+        assertEquals(43210, app.solveFirst("3,15,3,16,1002,16,10,16,1,16,15,15,4,15,99,0,0"))
+        assertEquals(54321, app.solveFirst("3,23,3,24,1002,24,10,24,1002,23,-1,23," +
+                "101,5,23,23,1,24,23,23,4,23,99,0,0"))
     }
 
     @Test
