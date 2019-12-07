@@ -14,6 +14,7 @@ class Task5Test {
                 "999,1105,1,46,1101,1000,1,20,4,20,1105,1,46,98,99"
         val task5 = Task5()
 
+        assertEquals(999, task5.solve(input, 1))
         assertEquals(1000, task5.solve(input, 8))
         assertEquals(1001, task5.solve(input, 42))
     }

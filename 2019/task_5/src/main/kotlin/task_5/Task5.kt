@@ -51,7 +51,7 @@ class Task5 {
                     ptrInc = state.opcodeSaveTo(ptr, inputValue)
                 }
                 4 -> {
-                    val result = state.opcodeGetFrom(ptr)
+                    val result = state.opcodeGetFrom(ptr, firstOperandMode)
                     outputValue = result.first
                     ptrInc = result.second
                 }
@@ -124,10 +124,10 @@ class Task5 {
         return 2
     }
 
-    fun MutableList<Int>.opcodeGetFrom(ptr: Int): Pair<Int, Int> {
-        val resultPtr = Mode.IMMEDIATE.get(this, ptr + 1)
+    fun MutableList<Int>.opcodeGetFrom(ptr: Int, firstOperandMode: Mode): Pair<Int, Int> {
+        val result = firstOperandMode.get(this, ptr + 1)
 
-        return Pair(this[resultPtr], 2)
+        return Pair(result, 2)
     }
 
     fun MutableList<Int>.opcodeJumpIfTrue(ptr: Int, firstOperand: Mode, secondOperand: Mode): Int {
