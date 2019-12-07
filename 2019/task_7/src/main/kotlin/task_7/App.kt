@@ -24,8 +24,6 @@ class App {
                             val dOutput = IntcodeComputer(input).addInput(dPhase, cOutput).solve()
                             val eOutput = IntcodeComputer(input).addInput(ePhase, dOutput).solve()
 
-//                            println("$aPhase,$bPhase,$cPhase,$dPhase,$ePhase")
-
                             if (eOutput > maxThruster) {
                                 maxThruster = eOutput
                             }
@@ -41,12 +39,6 @@ class App {
     fun solveSecond(input: String): Int {
         var maxThruster = 0
 
-        var intcodeComputerA = IntcodeComputer(input)
-        var intcodeComputerB = IntcodeComputer(input)
-        var intcodeComputerC = IntcodeComputer(input)
-        var intcodeComputerD = IntcodeComputer(input)
-        var intcodeComputerE = IntcodeComputer(input)
-
         for (aPhase in 5..9) {
             for (bPhase in 5..9) {
                 for (cPhase in 5..9) {
@@ -56,9 +48,11 @@ class App {
                                 continue
                             }
 
-                            if (aPhase > 8) {
-                                println("$aPhase,$bPhase,$cPhase,$dPhase,$ePhase")
-                            }
+                            val intcodeComputerA = IntcodeComputer(input)
+                            val intcodeComputerB = IntcodeComputer(input)
+                            val intcodeComputerC = IntcodeComputer(input)
+                            val intcodeComputerD = IntcodeComputer(input)
+                            val intcodeComputerE = IntcodeComputer(input)
 
                             var aOutput = intcodeComputerA.addInput(aPhase, 0).solve(true)
                             var bOutput = intcodeComputerB.addInput(bPhase, aOutput).solve(true)
@@ -66,7 +60,13 @@ class App {
                             var dOutput = intcodeComputerD.addInput(dPhase, cOutput).solve(true)
                             var eOutput = intcodeComputerE.addInput(ePhase, dOutput).solve(true)
 
+                            var cycles = 0
                             while (!intcodeComputerE.isHalt) {
+                                cycles++
+                                if (cycles > 9_000_000) {
+                                    throw RuntimeException("sanity limit - too much cycles: $aPhase,$bPhase,$cPhase,$dPhase,$ePhase")
+                                }
+
                                 aOutput = intcodeComputerA.addInput(eOutput).solve(true)
                                 bOutput = intcodeComputerB.addInput(aOutput).solve(true)
                                 cOutput = intcodeComputerC.addInput(bOutput).solve(true)
