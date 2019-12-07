@@ -41,11 +41,11 @@ class App {
     fun solveSecond(input: String): Int {
         var maxThruster = 0
 
-        val intcodeComputerA = IntcodeComputer(input)
-        val intcodeComputerB = IntcodeComputer(input)
-        val intcodeComputerC = IntcodeComputer(input)
-        val intcodeComputerD = IntcodeComputer(input)
-        val intcodeComputerE = IntcodeComputer(input)
+        var intcodeComputerA = IntcodeComputer(input)
+        var intcodeComputerB = IntcodeComputer(input)
+        var intcodeComputerC = IntcodeComputer(input)
+        var intcodeComputerD = IntcodeComputer(input)
+        var intcodeComputerE = IntcodeComputer(input)
 
         for (aPhase in 5..9) {
             for (bPhase in 5..9) {
@@ -60,18 +60,18 @@ class App {
                                 println("$aPhase,$bPhase,$cPhase,$dPhase,$ePhase")
                             }
 
-                            var aOutput = intcodeComputerA.addInput(aPhase, 0).solve()
-                            var bOutput = intcodeComputerB.addInput(bPhase, aOutput).solve()
-                            var cOutput = intcodeComputerC.addInput(cPhase, bOutput).solve()
-                            var dOutput = intcodeComputerD.addInput(dPhase, cOutput).solve()
-                            var eOutput = intcodeComputerE.addInput(ePhase, dOutput).solve()
+                            var aOutput = intcodeComputerA.addInput(aPhase, 0).solve(true)
+                            var bOutput = intcodeComputerB.addInput(bPhase, aOutput).solve(true)
+                            var cOutput = intcodeComputerC.addInput(cPhase, bOutput).solve(true)
+                            var dOutput = intcodeComputerD.addInput(dPhase, cOutput).solve(true)
+                            var eOutput = intcodeComputerE.addInput(ePhase, dOutput).solve(true)
 
                             while (!intcodeComputerE.isHalt) {
-                                aOutput = intcodeComputerA.addInput(eOutput).solve()
-                                bOutput = intcodeComputerB.addInput(aOutput).solve()
-                                cOutput = intcodeComputerC.addInput(bOutput).solve()
-                                dOutput = intcodeComputerD.addInput(cOutput).solve()
-                                eOutput = intcodeComputerE.addInput(dOutput).solve()
+                                aOutput = intcodeComputerA.addInput(eOutput).solve(true)
+                                bOutput = intcodeComputerB.addInput(aOutput).solve(true)
+                                cOutput = intcodeComputerC.addInput(bOutput).solve(true)
+                                dOutput = intcodeComputerD.addInput(cOutput).solve(true)
+                                eOutput = intcodeComputerE.addInput(dOutput).solve(true)
 
                                 if (eOutput > maxThruster) {
                                     maxThruster = eOutput
@@ -99,7 +99,7 @@ class IntcodeComputer(input: String) {
         return this
     }
 
-    fun solve(): Int {
+    fun solve(stopAtOutput: Boolean = false): Int {
         var ptrInc = 0
 
         while (true) {
@@ -134,7 +134,7 @@ class IntcodeComputer(input: String) {
                     val result = state.opcodeGetFrom(ptr, firstOperandMode)
                     outputValue = result.first
                     ptrInc = result.second
-                    finished = true
+                    if (stopAtOutput) finished = true
 //                    println("output: $outputValue")
                 }
                 5 -> {
@@ -146,14 +146,15 @@ class IntcodeComputer(input: String) {
                     ptrInc = 0
                 }
                 7 -> {
-                    ptrInc = state.opcodeLessThan(ptr, firstOperandMode, secondOperandMode, thirdOperandMode)
+                    ptrInc = state.opcodeLessThan(ptr, firstOperandMode, secondOperandMode)
                 }
                 8 -> {
-                    ptrInc = state.opcodeEquals(ptr, firstOperandMode, secondOperandMode, thirdOperandMode)
+                    ptrInc = state.opcodeEquals(ptr, firstOperandMode, secondOperandMode)
                 }
                 99 -> {
                     finished = true
                     isHalt = true
+                    ptr = 0
 //                    println("halt!")
                 }
                 else -> {
@@ -171,9 +172,9 @@ class IntcodeComputer(input: String) {
     private fun getInput(inputValues: MutableList<Int>): Int {
         val result = inputValues[0]
 
-        if (inputValues.size > 1) {
+//        if (inputValues.size > 1) {
             inputValues.removeAt(0)
-        }
+//        }
 
         return result
     }
@@ -246,20 +247,20 @@ class IntcodeComputer(input: String) {
         }
     }
 
-    fun MutableList<Int>.opcodeLessThan(ptr: Int, firstOperand: Mode, secondOperand: Mode, thirdOperandMode: Mode): Int {
+    fun MutableList<Int>.opcodeLessThan(ptr: Int, firstOperand: Mode, secondOperand: Mode): Int {
         val first = firstOperand.get(this, ptr + 1)
         val second = secondOperand.get(this, ptr + 2)
-        val resultPtr = thirdOperandMode.get(this, ptr + 3)
+        val resultPtr = Mode.IMMEDIATE.get(this, ptr + 3)
 
         this[resultPtr] = if (first < second) 1 else 0
 
         return 4
     }
 
-    fun MutableList<Int>.opcodeEquals(ptr: Int, firstOperand: Mode, secondOperand: Mode, thirdOperandMode: Mode): Int {
+    fun MutableList<Int>.opcodeEquals(ptr: Int, firstOperand: Mode, secondOperand: Mode): Int {
         val first = firstOperand.get(this, ptr + 1)
         val second = secondOperand.get(this, ptr + 2)
-        val resultPtr = thirdOperandMode.get(this, ptr + 3)
+        val resultPtr = Mode.IMMEDIATE.get(this, ptr + 3)
 
         this[resultPtr] = if (first == second) 1 else 0
 
