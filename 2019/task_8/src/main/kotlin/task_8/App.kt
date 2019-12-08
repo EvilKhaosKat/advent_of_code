@@ -26,12 +26,12 @@ class App(private val width: Int, private val height: Int) {
         val image = getImage(input, width, height)
 
         val generateResultLayer = image.generateResultLayer()
-        generateResultLayer.printLayer(width, height)
+        generateResultLayer.printLayer(width)
 
         return generateResultLayer
     }
 
-    private fun digitCount(layer: List<Int>, digit: Int) = layer.filter { it == digit }.count()
+    private fun digitCount(layer: List<Int>, digit: Int) = layer.count { it == digit }
 
     private fun getImage(input: List<Int>, width: Int, height: Int): Image {
         val image = Image(width, height)
@@ -89,14 +89,12 @@ class Image(private val width: Int, private val height: Int) {
     }
 }
 
-fun List<Int>.printLayer(width: Int, height: Int) {
+fun List<Int>.printLayer(width: Int) {
     var x = 0
-    var y = 0
 
     for (pixel in this) {
         if (x == width) {
             println()
-            y++
             x = 0
         }
 
