@@ -45,8 +45,8 @@ class App(private val width: Int, private val height: Int) {
                 pixelNum = 0
             }
 
-            pixelNum++
             layer.add(pixel)
+            pixelNum++
         }
 
         return image
@@ -73,7 +73,7 @@ class Image(private val width: Int, private val height: Int) {
 
                 for (layer in layers) {
                     val pixel = layer[x + y * width]
-                    if (pixel == 2) {
+                    if (pixel.isTransparent()) {
                         continue
                     } else {
                         resultPixel = pixel
@@ -87,6 +87,10 @@ class Image(private val width: Int, private val height: Int) {
 
         return resultLayer
     }
+}
+
+fun Int.isTransparent(): Boolean {
+    return this == 2
 }
 
 fun List<Int>.printLayer(width: Int) {
