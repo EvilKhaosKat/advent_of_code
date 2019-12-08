@@ -7,7 +7,7 @@ import java.io.File
 
 class App(private val width: Int, private val height: Int) {
     fun solveFirst(input: List<Int>): Int {
-        val image = getImage(input)
+        val image = getImage(input, width, height)
 
         var minZerosCount = width * height + 1
         var minZerosLayer: List<Int> = image.layers[0]
@@ -22,16 +22,25 @@ class App(private val width: Int, private val height: Int) {
         return digitCount(minZerosLayer, 1) * digitCount(minZerosLayer, 2)
     }
 
+    fun solveSecond(input: List<Int>): List<Int> {
+        val image = getImage(input, width, height)
+
+        val generateResultLayer = image.generateResultLayer()
+        generateResultLayer.printLayer(width, height)
+
+        return generateResultLayer
+    }
+
     private fun digitCount(layer: List<Int>, digit: Int) = layer.filter { it == digit }.count()
 
-    private fun getImage(input: List<Int>): Image {
-        val image = Image()
+    private fun getImage(input: List<Int>, width: Int, height: Int): Image {
+        val image = Image(width, height)
 
         var layer = image.newLayer()
 
         var pixelNum = 0
         for (pixel in input) {
-            if (pixelNum == width * height) {
+            if (pixelNum == this.width * this.height) {
                 layer = image.newLayer()
                 pixelNum = 0
             }
@@ -42,14 +51,9 @@ class App(private val width: Int, private val height: Int) {
 
         return image
     }
-
-    fun solveSecond(input: List<Int>): Int {
-        return -1
-    }
-
 }
 
-class Image {
+class Image(private val width: Int, private val height: Int) {
     val layers = mutableListOf<MutableList<Int>>()
 
     fun newLayer(): MutableList<Int> {
@@ -59,7 +63,50 @@ class Image {
 
         return newLayer
     }
+
+    fun generateResultLayer(): List<Int> {
+        val resultLayer = mutableListOf<Int>()
+
+        for (y in 0 until height) {
+            for (x in 0 until width) {
+                var resultPixel = -1
+
+                for (layer in layers) {
+                    val pixel = layer[x + y * width]
+                    if (pixel == 2) {
+                        continue
+                    } else {
+                        resultPixel = pixel
+                        break
+                    }
+                }
+
+                resultLayer.add(resultPixel)
+            }
+        }
+
+        return resultLayer
+    }
 }
+
+fun List<Int>.printLayer(width: Int, height: Int) {
+    var x = 0
+    var y = 0
+
+    for (pixel in this) {
+        if (x == width) {
+            println()
+            y++
+            x = 0
+        }
+
+        print(if (pixel == 1) "█" else " ")
+        x++
+    }
+
+    println()
+}
+
 
 fun main() {
     val app = App(25, 6)
