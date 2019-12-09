@@ -1,9 +1,7 @@
 package task_9
 
-import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
 
 class AppTest {
     @Test
@@ -23,17 +21,11 @@ class AppTest {
     }
 
     @Test
-    fun testFirstPart() {
+    fun testApp() {
         val app = App()
 
         assertEquals(99, app.solveFirst("109,1,204,-1,1001,100,1,100,1008,100,16,101,1006,101,0,99"))
         assertEquals(1125899906842624L, app.solveFirst("104,1125899906842624,99"))
         assertEquals(1219070632396864L, app.solveFirst("1102,34915192,34915192,7,4,7,99,0"))
-    }
-
-    @Test
-    fun testSecondPart() {
-        val app = App()
-
     }
 }

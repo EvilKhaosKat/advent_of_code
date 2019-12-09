@@ -11,7 +11,9 @@ class App {
     }
 
     fun solveSecond(input: String): Long {
-        return -1
+        val computer = IntcodeComputer(input)
+
+        return computer.addInput(2L).solve()
     }
 }
 
