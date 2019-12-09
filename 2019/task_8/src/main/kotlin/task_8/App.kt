@@ -7,7 +7,7 @@ import java.io.File
 
 class App(private val width: Int, private val height: Int) {
     fun solveFirst(input: List<Int>): Int {
-        val image = getImage(input, width, height)
+        val image = getImage(input)
 
         var minZerosCount = width * height + 1
         var minZerosLayer: List<Int> = image.layers[0]
@@ -23,7 +23,7 @@ class App(private val width: Int, private val height: Int) {
     }
 
     fun solveSecond(input: List<Int>): List<Int> {
-        val image = getImage(input, width, height)
+        val image = getImage(input)
 
         val generateResultLayer = image.generateResultLayer()
         generateResultLayer.printLayer(width)
@@ -33,14 +33,14 @@ class App(private val width: Int, private val height: Int) {
 
     private fun digitCount(layer: List<Int>, digit: Int) = layer.count { it == digit }
 
-    private fun getImage(input: List<Int>, width: Int, height: Int): Image {
+    private fun getImage(input: List<Int>): Image {
         val image = Image(width, height)
 
         var layer = image.newLayer()
 
         var pixelNum = 0
         for (pixel in input) {
-            if (pixelNum == this.width * this.height) {
+            if (pixelNum == width * height) {
                 layer = image.newLayer()
                 pixelNum = 0
             }
@@ -67,22 +67,20 @@ class Image(private val width: Int, private val height: Int) {
     fun generateResultLayer(): List<Int> {
         val resultLayer = mutableListOf<Int>()
 
-        for (y in 0 until height) {
-            for (x in 0 until width) {
-                var resultPixel = -1
+        for (index in 0 until height * width) {
+            var resultPixel = -1
 
-                for (layer in layers) {
-                    val pixel = layer[x + y * width]
-                    if (pixel.isTransparent()) {
-                        continue
-                    } else {
-                        resultPixel = pixel
-                        break
-                    }
+            for (layer in layers) {
+                val pixel = layer[index]
+                if (pixel.isTransparent()) {
+                    continue
+                } else {
+                    resultPixel = pixel
+                    break
                 }
-
-                resultLayer.add(resultPixel)
             }
+
+            resultLayer.add(resultPixel)
         }
 
         return resultLayer
@@ -94,16 +92,16 @@ fun Int.isTransparent(): Boolean {
 }
 
 fun List<Int>.printLayer(width: Int) {
-    var x = 0
+    var index = 0
 
     for (pixel in this) {
-        if (x == width) {
+        if (index == width) {
             println()
-            x = 0
+            index = 0
         }
 
         print(if (pixel == 1) "█" else " ")
-        x++
+        index++
     }
 
     println()
