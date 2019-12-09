@@ -30,6 +30,8 @@ class IntcodeComputer(input: String) {
 
     private var relativeBase = 0
 
+    private val extendedMemory = HashMap<Int, Long>()
+
     private var inputValues = mutableListOf<Long>()
     private var outputValue = 0L
 
@@ -132,7 +134,7 @@ class IntcodeComputer(input: String) {
         val second = get(secondOperand, ptr + 2, relativeBase + 1)
         val resultPtr = get(Mode.IMMEDIATE, ptr + 3, relativeBase + 1)
 
-        state[resultPtr.toInt()] = first + second
+        setByIndex(resultPtr.toInt(), first + second)
 
         return 4
     }
@@ -142,7 +144,7 @@ class IntcodeComputer(input: String) {
         val second = get(secondOperand, ptr + 2, relativeBase + 2)
         val resultPtr = get(Mode.IMMEDIATE, ptr + 3, relativeBase + 3)
 
-        state[resultPtr.toInt()] = first * second
+        setByIndex(resultPtr.toInt(), first * second)
 
         return 4
     }
@@ -150,7 +152,7 @@ class IntcodeComputer(input: String) {
     fun opcodeSaveTo(input: Long): Int {
         val resultPtr = get(Mode.IMMEDIATE, ptr + 1, relativeBase + 1)
 
-        state[resultPtr.toInt()] = input
+        setByIndex(resultPtr.toInt(), input)
 
         return 2
     }
@@ -188,7 +190,7 @@ class IntcodeComputer(input: String) {
         val second = get(secondOperand, ptr + 2, relativeBase + 2)
         val resultPtr = get(Mode.IMMEDIATE, ptr + 3, relativeBase + 3)
 
-        state[resultPtr.toInt()] = if (first < second) 1 else 0
+        setByIndex(resultPtr.toInt(), if (first < second) 1 else 0)
 
         return 4
     }
@@ -198,7 +200,7 @@ class IntcodeComputer(input: String) {
         val second = get(secondOperand, ptr + 2, relativeBase)
         val resultPtr = get(Mode.IMMEDIATE, ptr + 3, relativeBase)
 
-        state[resultPtr.toInt()] = if (first == second) 1 else 0
+        setByIndex(resultPtr.toInt(), if (first == second) 1 else 0)
 
         return 4
     }
@@ -221,9 +223,25 @@ class IntcodeComputer(input: String) {
         }
     }
 
-    fun getPositionMode(index: Int): Long = state[state[index].toInt()]
-    fun getImmediateMode(index: Int): Long = state[index]
-    fun getRelativeMode(index: Int, relativeBase: Int): Long = state[state[relativeBase + index].toInt()]
+    fun getPositionMode(index: Int): Long = getByIndex(getByIndex(index).toInt())
+    fun getImmediateMode(index: Int): Long = getByIndex(index)
+    fun getRelativeMode(index: Int, relativeBase: Int): Long = getByIndex(getByIndex(relativeBase + index).toInt())
+
+    fun getByIndex(index: Int): Long {
+        if (index > state.size) {
+           return extendedMemory.getOrDefault(index, 0)
+        }
+
+        return state[index]
+    }
+
+    fun setByIndex(index: Int, value: Long) {
+        if (index > state.size) {
+            extendedMemory[index] = value
+        } else {
+            state[index] = value
+        }
+    }
 }
 
 enum class Mode {
