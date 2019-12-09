@@ -69,7 +69,6 @@ class IntcodeComputer(input: String) {
                     outputValue = result.first
                     ptrInc = result.second
 
-                    println("outputValue = ${outputValue}")
                     if (stopAtOutput) finished = true
                 }
                 5L -> {
@@ -126,9 +125,9 @@ class IntcodeComputer(input: String) {
     }
 
     fun opcodeAdd(firstOperand: Mode, secondOperand: Mode, thirdOperandMode: Mode): Int {
-        val first = get(firstOperand, ptr + 1, relativeBase)
-        val second = get(secondOperand, ptr + 2, relativeBase)
-        val resultPtr = getIndex(thirdOperandMode, ptr + 3, relativeBase)
+        val first = get(firstOperand, ptr + 1)
+        val second = get(secondOperand, ptr + 2)
+        val resultPtr = getIndex(thirdOperandMode, ptr + 3)
 
         setByIndex(resultPtr, first + second)
 
@@ -136,9 +135,9 @@ class IntcodeComputer(input: String) {
     }
 
     fun opcodeMult(firstOperand: Mode, secondOperand: Mode, thirdOperandMode: Mode): Int {
-        val first = get(firstOperand, ptr + 1, relativeBase)
-        val second = get(secondOperand, ptr + 2, relativeBase)
-        val resultPtr = getIndex(thirdOperandMode, ptr + 3, relativeBase)
+        val first = get(firstOperand, ptr + 1)
+        val second = get(secondOperand, ptr + 2)
+        val resultPtr = getIndex(thirdOperandMode, ptr + 3)
 
         setByIndex(resultPtr, first * second)
 
@@ -146,7 +145,7 @@ class IntcodeComputer(input: String) {
     }
 
     fun opcodeSaveTo(firstOperand: Mode, input: Long): Int {
-        val resultPtr = getIndex(firstOperand, ptr + 1, relativeBase)
+        val resultPtr = getIndex(firstOperand, ptr + 1)
 
         setByIndex(resultPtr, input)
 
@@ -154,15 +153,15 @@ class IntcodeComputer(input: String) {
     }
 
     fun opcodeGetFrom(firstOperandMode: Mode): Pair<Long, Int> {
-        val result = get(firstOperandMode, ptr + 1, relativeBase)
+        val result = get(firstOperandMode, ptr + 1)
         //getByIndex(relativeBase + getByIndex(index).toInt())
 
         return Pair(result, 2)
     }
 
     fun opcodeJumpIfTrue(firstOperand: Mode, secondOperand: Mode): Int {
-        val first = get(firstOperand, ptr + 1, relativeBase)
-        val second = get(secondOperand, ptr + 2, relativeBase)
+        val first = get(firstOperand, ptr + 1)
+        val second = get(secondOperand, ptr + 2)
 
         return if (first != 0L) {
             second.toInt()
@@ -172,8 +171,8 @@ class IntcodeComputer(input: String) {
     }
 
     fun opcodeJumpIfFalse(firstOperand: Mode, secondOperand: Mode): Int {
-        val first = get(firstOperand, ptr + 1, relativeBase)
-        val second = get(secondOperand, ptr + 2, relativeBase)
+        val first = get(firstOperand, ptr + 1)
+        val second = get(secondOperand, ptr + 2)
 
         return if (first == 0L) {
             second.toInt()
@@ -183,9 +182,9 @@ class IntcodeComputer(input: String) {
     }
 
     fun opcodeLessThan(firstOperand: Mode, secondOperand: Mode, thirdOperandMode: Mode): Int {
-        val first = get(firstOperand, ptr + 1, relativeBase)
-        val second = get(secondOperand, ptr + 2, relativeBase)
-        val resultPtr = getIndex(thirdOperandMode, ptr + 3, relativeBase)
+        val first = get(firstOperand, ptr + 1)
+        val second = get(secondOperand, ptr + 2)
+        val resultPtr = getIndex(thirdOperandMode, ptr + 3)
 
         setByIndex(resultPtr, if (first < second) 1 else 0)
 
@@ -193,9 +192,9 @@ class IntcodeComputer(input: String) {
     }
 
     fun opcodeEquals(firstOperand: Mode, secondOperand: Mode, thirdOperandMode: Mode): Int {
-        val first = get(firstOperand, ptr + 1, relativeBase)
-        val second = get(secondOperand, ptr + 2, relativeBase)
-        val resultPtr = getIndex(thirdOperandMode, ptr + 3, relativeBase)
+        val first = get(firstOperand, ptr + 1)
+        val second = get(secondOperand, ptr + 2)
+        val resultPtr = getIndex(thirdOperandMode, ptr + 3)
 
         setByIndex(resultPtr, if (first == second) 1 else 0)
 
@@ -203,7 +202,7 @@ class IntcodeComputer(input: String) {
     }
 
     fun opcodeAdjustRelativeBase(firstOperand: Mode): Int {
-        val first = get(firstOperand, ptr + 1, relativeBase)
+        val first = get(firstOperand, ptr + 1)
 
         relativeBase += first.toInt()
 
@@ -212,7 +211,7 @@ class IntcodeComputer(input: String) {
 
     private fun getStateByInput(input: String) = input.split(',').map { it.toLong() }.toMutableList()
 
-    fun get(operand: Mode, ptr: Int, relativeBase: Int): Long {
+    fun get(operand: Mode, ptr: Int): Long {
         return when (operand) {
             Mode.POSITION -> getPositionMode(ptr)
             Mode.IMMEDIATE -> getImmediateMode(ptr)
@@ -220,7 +219,7 @@ class IntcodeComputer(input: String) {
         }
     }
 
-    fun getIndex(operand: Mode, ptr: Int, relativeBase: Int): Int {
+    fun getIndex(operand: Mode, ptr: Int): Int {
         return when (operand) {
             Mode.POSITION -> getByIndex(ptr).toInt()
             Mode.RELATIVE -> relativeBase + getByIndex(ptr).toInt()
