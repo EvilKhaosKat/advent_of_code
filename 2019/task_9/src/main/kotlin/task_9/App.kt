@@ -86,7 +86,10 @@ class IntcodeComputer(input: String) {
                     ptrInc = opcodeLessThan(firstOperandMode, secondOperandMode)
                 }
                 8 -> {
-                    ptrInc = opcodeEquals(ptr, firstOperandMode, secondOperandMode)
+                    ptrInc = opcodeEquals(firstOperandMode, secondOperandMode)
+                }
+                9 -> {
+                    ptrInc = opcodeAdjustRelativeBase(firstOperandMode)
                 }
                 99 -> {
                     isHalt = true
@@ -190,14 +193,22 @@ class IntcodeComputer(input: String) {
         return 4
     }
 
-    fun opcodeEquals(ptr: Int, firstOperand: Mode, secondOperand: Mode): Int {
+    fun opcodeEquals(firstOperand: Mode, secondOperand: Mode): Int {
         val first = firstOperand.get(state, ptr + 1, relativeBase)
         val second = secondOperand.get(state, ptr + 2, relativeBase)
         val resultPtr = Mode.IMMEDIATE.get(state, ptr + 3, relativeBase)
 
-        this.state[resultPtr] = if (first == second) 1 else 0
+        state[resultPtr] = if (first == second) 1 else 0
 
         return 4
+    }
+
+    fun opcodeAdjustRelativeBase(firstOperand: Mode): Int {
+        val first = firstOperand.get(state, ptr + 1, relativeBase)
+
+        relativeBase += first
+
+        return 2
     }
 
     private fun getStateByInput(input: String) = input.split(',').map { it.toInt() }.toMutableList()
