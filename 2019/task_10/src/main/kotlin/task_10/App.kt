@@ -5,17 +5,14 @@ import java.util.*
 
 class App {
     fun solveFirst(input: List<String>): Int {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val map = Map(input)
+        var (_, asteroids) = map.getBestLocation()
+        return asteroids.size
     }
 
     fun solveSecond(input: List<String>): Int {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
-
-    val greeting: String
-        get() {
-            return "Hello world."
-        }
 }
 
 class Map(input: List<String>) {
@@ -57,14 +54,17 @@ class Map(input: List<String>) {
     }
 
     private fun getVisibleAsteroids(asteroid: Point): List<Point> {
-        var visibleAsteroids = mutableListOf<Point>()
+        val visibleAsteroids = mutableListOf<Point>()
 
         val pointsToCheck = ArrayDeque<Point>()
-        pointsToCheck.addAll(getPoints(asteroid, 1))
+
+        for (radius in 1..map.size.coerceAtLeast(map[0].size)) {
+            pointsToCheck.addAll(getPoints(asteroid, radius))
+        }
 
         while (pointsToCheck.size > 0) {
             val point = pointsToCheck.pop()
-            if (map[point.x][point.y].isAsteroid()) {
+            if (map[point.y][point.x].isAsteroid()) {
                 if (!hiddenByVisibleAsteroids(visibleAsteroids, asteroid, point)) {
                     visibleAsteroids.add(point)
                 }
@@ -107,9 +107,9 @@ class Map(input: List<String>) {
 
         //right bottom corner
         targetX = currX
-        targetY = currY + radius
+        targetY = currY + sideSize - 1
 
-        for (y in currY downTo targetY) {
+        for (y in currY until targetY) {
             if (correctCoordinate(currX, y)) {
                 points.add(Point(currX, y))
             }
@@ -118,10 +118,10 @@ class Map(input: List<String>) {
         currY = targetY
 
         //left bottom corner
-        targetX = currX - radius
+        targetX = currX - sideSize + 1
         targetY = currY
 
-        for (x in currX downTo  targetX) {
+        for (x in currX downTo targetX) {
             if (correctCoordinate(x, currY)) {
                 points.add(Point(x, currY))
             }
@@ -132,7 +132,7 @@ class Map(input: List<String>) {
 
         //left top corner
         targetX = currX
-        targetY = currY - radius
+        targetY = currY - sideSize + 1
 
         for (y in currY downTo targetY) {
             if (correctCoordinate(currX, y)) {
@@ -144,7 +144,7 @@ class Map(input: List<String>) {
 
 
         //till start point
-        targetX = currX + sideSize / 2
+        targetX = (currX + sideSize - 1)/2 + 1
         targetY = currY
 
         for (x in currX until targetX) {
@@ -192,7 +192,7 @@ class Map(input: List<String>) {
         return when (this) {
             '.' -> 0
             '#' -> 1
-            else -> throw RuntimeException("unknown value of $this")
+            else -> throw RuntimeException("unknown value of '$this'")
         }
     }
 
