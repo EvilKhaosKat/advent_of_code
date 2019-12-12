@@ -69,16 +69,7 @@ class App {
     }
 }
 
-data class Point(val x: Int, val y: Int) : Comparable<Point> {
-    override fun compareTo(other: Point): Int {
-        if (this.y > other.y) return 1
-        if (this.y < other.y) return -1
-        if (this.x > other.x) return 1
-        if (this.x < other.x) return -1
-        return 0
-    }
-}
-
+data class Point(val x: Int, val y: Int)
 class IntcodeComputer(input: String) {
     var isHalt = false
 
