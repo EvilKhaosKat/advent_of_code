@@ -83,7 +83,6 @@ proc performStep(moons: seq[Moon]) =
     var refMoon = moon
     refMoon.applyVelocity()
 
-
 proc same(originalMoons, moons: seq[Moon], checkX = false, checkY = false, checkZ = false): bool =
   let pairs = zip(originalMoons, moons)
   for pair in pairs:

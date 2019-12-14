@@ -44,13 +44,15 @@ class App {
 
         val defaultColor = Color.BLACK
 
-        var i = 0
         while (!computer.isHalt) {
-            i++
             val currentPanelColor = panels.getOrDefault(Point(x, y), defaultColor)
             computer.addInput(currentPanelColor.num.toLong())
 
             val paintToColor = computer.solve(true)
+            if (computer.isHalt) {
+                break
+            }
+
             panels[Point(x, y)] = Color.of(paintToColor.toInt())
 
             direction = when (computer.solve(true)) {
@@ -63,13 +65,12 @@ class App {
             y += direction.y
         }
 
-        println("i = ${i}")
-
         return panels
     }
 }
 
 data class Point(val x: Int, val y: Int)
+
 class IntcodeComputer(input: String) {
     var isHalt = false
 
@@ -304,7 +305,8 @@ class IntcodeComputer(input: String) {
 }
 
 enum class Direction(val x: Int, val y: Int) {
-    UP(0, -1), RIGHT(1, 0), DOWN(0, 1), LEFT(-1, 0);
+//    UP(0, -1), RIGHT(1, 0), DOWN(0, 1), LEFT(-1, 0);
+    UP(0, 1), RIGHT(1, 0), DOWN(0, -1), LEFT(-1, 0);
 
     fun left(): Direction {
         val values = values()
