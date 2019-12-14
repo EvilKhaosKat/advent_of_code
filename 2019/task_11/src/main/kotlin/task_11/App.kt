@@ -8,23 +8,23 @@ import java.lang.RuntimeException
 
 class App {
     fun solveFirst(input: String): Int {
-        return getDrawnPanels(input).size
+        return getDrawnPanels(input, Color.BLACK).size
     }
 
     fun solveSecond(input: String): Int {
-        val panels = getDrawnPanels(input)
+        val panels = getDrawnPanels(input, Color.WHITE)
 
         val minX = panels.keys.minBy { it.x }!!.x
         val maxX = panels.keys.maxBy { it.x }!!.x
         val minY = panels.keys.minBy { it.y }!!.y
         val maxY = panels.keys.maxBy { it.y }!!.y
 
-        for (x in minX..maxX) {
-            for (y in minY..maxY) {
+        for (y in minY..maxY) {
+            for (x in minX..maxX) {
                 val colorToPaint = panels.getOrDefault(Point(x, y), Color.BLACK)
                 when (colorToPaint) {
                     Color.BLACK -> print(" ")
-                    Color.WHITE -> print("#")
+                    Color.WHITE -> print("█")
                 }
             }
 
@@ -33,8 +33,9 @@ class App {
         return -1
     }
 
-    private fun getDrawnPanels(input: String): Map<Point, Color> {
+    private fun getDrawnPanels(input: String, startPanelColor: Color): Map<Point, Color> {
         val panels = HashMap<Point, Color>()
+        panels[Point(0, 0)] = startPanelColor
 
         var direction = Direction.UP
         var x = 0
@@ -305,8 +306,7 @@ class IntcodeComputer(input: String) {
 }
 
 enum class Direction(val x: Int, val y: Int) {
-//    UP(0, -1), RIGHT(1, 0), DOWN(0, 1), LEFT(-1, 0);
-    UP(0, 1), RIGHT(1, 0), DOWN(0, -1), LEFT(-1, 0);
+    UP(0, -1), RIGHT(1, 0), DOWN(0, 1), LEFT(-1, 0);
 
     fun left(): Direction {
         val values = values()
