@@ -1,70 +1,50 @@
-package task_11
+package task_13
 
 import java.io.File
 import java.lang.RuntimeException
 
 class App {
     fun solveFirst(input: String): Int {
-        return getDrawnPanels(input, Color.BLACK).size
-    }
-
-    fun solveSecond(input: String): Int {
-        val panels = getDrawnPanels(input, Color.WHITE)
-
-        val minX = panels.keys.minBy { it.x }!!.x
-        val maxX = panels.keys.maxBy { it.x }!!.x
-        val minY = panels.keys.minBy { it.y }!!.y
-        val maxY = panels.keys.maxBy { it.y }!!.y
-
-        for (y in minY..maxY) {
-            for (x in minX..maxX) {
-                val colorToPaint = panels.getOrDefault(Point(x, y), Color.BLACK)
-                when (colorToPaint) {
-                    Color.BLACK -> print(" ")
-                    Color.WHITE -> print("█")
-                }
-            }
-
-            println()
-        }
-        return -1
-    }
-
-    private fun getDrawnPanels(input: String, startPanelColor: Color): Map<Point, Color> {
-        val panels = HashMap<Point, Color>()
-        panels[Point(0, 0)] = startPanelColor
-
-        var direction = Direction.UP
-        var x = 0
-        var y = 0
+        val tiles = HashMap<Point, Tile>()
 
         val computer = IntcodeComputer(input)
 
-        val defaultColor = Color.BLACK
-
         while (!computer.isHalt) {
-            val currentPanelColor = panels.getOrDefault(Point(x, y), defaultColor)
-            computer.addInput(currentPanelColor.num.toLong())
+            val x = computer.run()
+            val y = computer.run()
+            val tileId = computer.run()
 
-            val paintToColor = computer.solve(true)
-            if (computer.isHalt) {
-                break
-            }
-
-            panels[Point(x, y)] = Color.of(paintToColor.toInt())
-
-            direction = when (computer.solve(true)) {
-                0L -> direction.left()
-                1L -> direction.right()
-                else -> throw RuntimeException("Unknown direction to turn")
-            }
-
-            x += direction.x
-            y += direction.y
+            tiles[Point(x.toInt(), y.toInt())] = Tile.of(tileId.toInt())
         }
 
-        return panels
+        return tiles.filterValues { it == Tile.BLOCK }.size
     }
+
+    fun solveSecond(input: String): Int {
+        return -1
+    }
+}
+
+enum class Tile {
+    EMPTY,
+    WALL,
+    BLOCK,
+    HORIZONTAL_PADDLE,
+    BALL;
+
+    companion object {
+        fun of(id: Int): Tile {
+            return when (id) {
+                0 -> EMPTY
+                1 -> WALL
+                2 -> BLOCK
+                3 -> HORIZONTAL_PADDLE
+                4 -> BALL
+                else -> throw RuntimeException("unknown tile id $id")
+            }
+        }
+    }
+
 }
 
 data class Point(val x: Int, val y: Int)
@@ -87,7 +67,7 @@ class IntcodeComputer(input: String) {
         return this
     }
 
-    fun solve(stopAtOutput: Boolean = false): Long {
+    fun run(stopAtOutput: Boolean = true): Long {
         var ptrInc = 0
 
         while (true) {
@@ -144,7 +124,6 @@ class IntcodeComputer(input: String) {
                 }
                 99L -> {
                     isHalt = true
-                    ptr = 0
                 }
                 else -> {
                     println("unknown value of $num")
@@ -300,56 +279,22 @@ class IntcodeComputer(input: String) {
             state[index] = value
         }
     }
-}
 
-enum class Direction(val x: Int, val y: Int) {
-    UP(0, -1), RIGHT(1, 0), DOWN(0, 1), LEFT(-1, 0);
+    enum class Mode {
+        POSITION, IMMEDIATE, RELATIVE;
 
-    fun left(): Direction {
-        val values = values()
-        var nextOrdinal = (ordinal - 1) % values.size
-
-        if (nextOrdinal < 0) {
-            nextOrdinal = values.size - 1
-        }
-
-        return values[nextOrdinal]
-    }
-
-    fun right(): Direction {
-        val values = values()
-        val nextOrdinal = (ordinal + 1) % values.size
-        return values[nextOrdinal]
-    }
-}
-
-enum class Color(val num: Int) {
-    BLACK(0), WHITE(1);
-
-    companion object {
-        fun of(value: Int): Color {
-            return when (value) {
-                BLACK.num -> BLACK
-                WHITE.num -> WHITE
-                else -> throw RuntimeException("Unknown color value of $value")
+        companion object {
+            fun of(value: Char): Mode {
+                return when (value) {
+                    '0' -> POSITION
+                    '1' -> IMMEDIATE
+                    '2' -> RELATIVE
+                    else -> throw RuntimeException("Unknown mode value of $value")
+                }
             }
         }
     }
-}
 
-enum class Mode {
-    POSITION, IMMEDIATE, RELATIVE;
-
-    companion object {
-        fun of(value: Char): Mode {
-            return when (value) {
-                '0' -> POSITION
-                '1' -> IMMEDIATE
-                '2' -> RELATIVE
-                else -> throw RuntimeException("Unknown mode value of $value")
-            }
-        }
-    }
 }
 
 fun main() {
