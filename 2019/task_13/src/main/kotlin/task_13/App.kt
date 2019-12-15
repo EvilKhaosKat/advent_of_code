@@ -20,17 +20,123 @@ class App {
         return tiles.filterValues { it == Tile.BLOCK }.size
     }
 
-    fun solveSecond(input: String): Int {
-        return -1
+    //TODO pretty bad code, also needs proper simulation of ball
+    fun solveSecond(input: String): Long {
+        val tiles = HashMap<Point, Tile>()
+
+        val computer = IntcodeComputer(input)
+        computer.state[0] = 2 //add coins
+
+        var score = 0L
+
+        var paddleX = 0
+        var ballX = 0
+        var ballSpeedX = 0
+        while (!computer.isHalt) {
+            val x = computer.run()
+            val y = computer.run()
+            val tileId = computer.run()
+
+            if (isScoreOutput(x, y)) {
+                score = tileId
+            } else {
+                tiles[Point(x.toInt(), y.toInt())] = Tile.of(tileId.toInt())
+            }
+
+            if (isGameStarted(tiles)) {
+                var simulatedBallX = ballX + ballSpeedX
+
+                val (paddleFound, paddlePos) = get(tiles, Tile.HORIZONTAL_PADDLE)
+                val (ballFound, newBallPos) = get(tiles, Tile.BALL)
+
+                if (paddleFound && ballFound) {
+                    if (ballX > newBallPos.x) {
+                        ballSpeedX = -1
+                    } else if (ballX < newBallPos.x) {
+                        ballSpeedX = 1
+                    }
+
+                    if (newBallPos.x >= 41) {
+                        ballSpeedX = -1
+                    }
+
+                    ballX = newBallPos.x
+
+                    simulatedBallX = ballX + ballSpeedX
+
+                    if (computer.inputValues.size < 1) {
+                        if ((simulatedBallX > paddlePos.x) && cornerCase(paddleX)) {
+                            computer.addInput(1)
+                        } else if (simulatedBallX < paddlePos.x) {
+                            computer.addInput(-1)
+                        } else {
+                            computer.addInput(0)
+                        }
+                    }
+                }
+
+
+                if(paddleFound && ballFound) {
+                    println()
+                    printTiles(tiles)
+                    println("simulatedBallX: $simulatedBallX, " +
+                            "paddlePos:${paddlePos}, " +
+                            "pc: ${computer.inputValues}, " +
+                            "score: ${score}")
+                }
+
+                Thread.sleep(42L)
+            }
+        }
+
+        println(computer.inputValues)
+        return score
     }
+
+    private fun isGameStarted(tiles: HashMap<Point, Tile>) = tiles.size > 988
+
+    private fun cornerCase(paddleX: Int): Boolean {
+        if (paddleX == 40) {
+            return false
+        }
+        return true
+    }
+
+    private fun get(tiles: HashMap<Point, Tile>, tile: Tile): Pair<Boolean, Point> {
+        val tiles = tiles.filter { it.value == tile }.keys
+        if (tiles.isEmpty()) {
+            return Pair(false, Point(-1, -1))
+        }
+        return Pair(true, tiles.iterator().next())
+    }
+
+    private fun printTiles(tiles: HashMap<Point, Tile>) {
+        val minX = tiles.minBy { it.key.x }!!.key.x
+        val maxX = tiles.maxBy { it.key.x }!!.key.x
+        val minY = tiles.minBy { it.key.y }!!.key.y
+        val maxY = tiles.maxBy { it.key.y }!!.key.y
+
+        for (y in minY..maxY) {
+            for (x in minX..maxX) {
+                val tile = tiles[Point(x, y)]
+                if (tile != null) {
+                    print(tile.symbol)
+                }
+            }
+
+            println()
+        }
+    }
+
+    private fun isScoreOutput(x: Long, y: Long) = x == -1L && y == 0L
 }
 
-enum class Tile {
-    EMPTY,
-    WALL,
-    BLOCK,
-    HORIZONTAL_PADDLE,
-    BALL;
+enum class Tile(val symbol: Char) {
+    EMPTY(' '),
+    WALL('#'),
+    BLOCK('█'),
+    HORIZONTAL_PADDLE('P'),
+    BALL('O');
 
     companion object {
         fun of(id: Int): Tile {
@@ -52,14 +158,14 @@ data class Point(val x: Int, val y: Int)
 class IntcodeComputer(input: String) {
     var isHalt = false
 
-    private var state = getStateByInput(input)
+    var state = getStateByInput(input)
     private var ptr = 0
 
     private var relativeBase = 0
 
     private val extendedMemory = HashMap<Int, Long>()
 
-    private var inputValues = mutableListOf<Long>()
+    var inputValues = mutableListOf<Long>()
     private var outputValue = 0L
 
     fun addInput(vararg input: Long): IntcodeComputer {
@@ -67,7 +173,7 @@ class IntcodeComputer(input: String) {
         return this
     }
 
-    fun run(stopAtOutput: Boolean = true): Long {
+    fun run(stopAtOutput: Boolean = true, stopAtInput: Boolean = false): Long {
         var ptrInc = 0
 
         while (true) {
