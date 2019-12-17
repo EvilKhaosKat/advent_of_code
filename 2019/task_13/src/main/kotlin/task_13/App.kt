@@ -20,7 +20,7 @@ class App {
         return tiles.filterValues { it == Tile.BLOCK }.size
     }
 
-    //TODO pretty bad code, also needs proper simulation of ball
+    //TODO pretty bad code
     fun solveSecond(input: String): Long {
         val tiles = HashMap<Point, Tile>()
 
@@ -29,9 +29,6 @@ class App {
 
         var score = 0L
 
-        var paddleX = 0
-        var ballX = 0
-        var ballSpeedX = 0
         while (!computer.isHalt) {
             val x = computer.run()
             val y = computer.run()
@@ -43,71 +40,43 @@ class App {
                 tiles[Point(x.toInt(), y.toInt())] = Tile.of(tileId.toInt())
             }
 
-            if (isGameStarted(tiles)) {
-                var simulatedBallX = ballX + ballSpeedX
+            val (paddleFound, paddlePos) = get(tiles, Tile.HORIZONTAL_PADDLE)
+            val (ballFound, ballPos) = get(tiles, Tile.BALL)
 
-                val (paddleFound, paddlePos) = get(tiles, Tile.HORIZONTAL_PADDLE)
-                val (ballFound, newBallPos) = get(tiles, Tile.BALL)
-
-                if (paddleFound && ballFound) {
-                    if (ballX > newBallPos.x) {
-                        ballSpeedX = -1
-                    } else if (ballX < newBallPos.x) {
-                        ballSpeedX = 1
+            if (paddleFound && ballFound) {
+                when {
+                    ballPos.x < paddlePos.x -> {
+                        setInput(computer, -1)
                     }
-
-                    if (newBallPos.x >= 41) {
-                        ballSpeedX = -1
+                    ballPos.x > paddlePos.x -> {
+                        setInput(computer, 1)
                     }
-
-                    ballX = newBallPos.x
-
-                    simulatedBallX = ballX + ballSpeedX
-
-                    if (computer.inputValues.size < 1) {
-                        if ((simulatedBallX > paddlePos.x) && cornerCase(paddleX)) {
-                            computer.addInput(1)
-                        } else if (simulatedBallX < paddlePos.x) {
-                            computer.addInput(-1)
-                        } else {
-                            computer.addInput(0)
-                        }
+                    else -> {
+                        setInput(computer, 0)
                     }
                 }
-
-
-                if(paddleFound && ballFound) {
-                    println()
-                    printTiles(tiles)
-                    println("simulatedBallX: $simulatedBallX, " +
-                            "paddlePos:${paddlePos}, " +
-                            "pc: ${computer.inputValues}, " +
-                            "score: ${score}")
-                }
-
-                Thread.sleep(42L)
             }
         }
 
-        println(computer.inputValues)
         return score
     }
 
-    private fun isGameStarted(tiles: HashMap<Point, Tile>) = tiles.size > 988
-
-    private fun cornerCase(paddleX: Int): Boolean {
-        if (paddleX == 40) {
-            return false
+    private fun setInput(computer: IntcodeComputer, input: Int) {
+        if (computer.inputValues.size < 1) {
+            computer.addInput(input.toLong())
+        } else {
+            computer.inputValues[0] = input.toLong()
         }
-        return true
     }
 
-    private fun get(tiles: HashMap<Point, Tile>, tile: Tile): Pair<Boolean, Point> {
-        val tiles = tiles.filter { it.value == tile }.keys
-        if (tiles.isEmpty()) {
-            return Pair(false, Point(-1, -1))
+    private fun get(tiles: HashMap<Point, Tile>, tileToFind: Tile): Pair<Boolean, Point> {
+        for ((point, tile) in tiles) {
+            if (tile == tileToFind) {
+                return Pair(true, point)
+            }
         }
-        return Pair(true, tiles.iterator().next())
+
+        return Pair(false, Point(-1, -1))
     }
 
     private fun printTiles(tiles: HashMap<Point, Tile>) {
@@ -173,7 +142,7 @@ class IntcodeComputer(input: String) {
         return this
     }
 
-    fun run(stopAtOutput: Boolean = true, stopAtInput: Boolean = false): Long {
+    fun run(stopAtOutput: Boolean = true): Long {
         var ptrInc = 0
 
         while (true) {
