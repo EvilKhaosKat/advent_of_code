@@ -9,12 +9,12 @@ class AppTest {
     fun testExamples() {
         val app = App()
 
-/*        assertEquals(8, app.solveFirst(listOf(
+        assertEquals(8, app.solveFirst(listOf(
                 ".#..#",
                 ".....",
                 "#####",
                 "....#",
-                "...##")))*/
+                "...##")))
 
         assertEquals(33, app.solveFirst(listOf(
                 "......#.#.",

@@ -1,7 +1,8 @@
 package task_10
 
 import java.io.File
-import java.util.*
+import java.lang.Integer.max
+import java.lang.Integer.min
 
 class App {
     fun solveFirst(input: List<String>): Int {
@@ -11,7 +12,7 @@ class App {
     }
 
     fun solveSecond(input: List<String>): Int {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return -1
     }
 }
 
@@ -42,7 +43,7 @@ class Map(input: List<String>) {
 
         //TODO use channels
         for (asteroid in asteroids) {
-            val visibleAsteroids = getVisibleAsteroids(asteroid)
+            val visibleAsteroids = getVisibleAsteroids(asteroid, asteroids)
 
             if (visibleAsteroids.size > bestVisibleAsteroids.size) {
                 bestPosition = asteroid
@@ -53,30 +54,28 @@ class Map(input: List<String>) {
         return Pair(bestPosition, bestVisibleAsteroids)
     }
 
-    private fun getVisibleAsteroids(asteroid: Point): List<Point> {
+    private fun getVisibleAsteroids(asteroid: Point, asteroids: MutableList<Point>): List<Point> {
         val visibleAsteroids = mutableListOf<Point>()
 
-        val pointsToCheck = ArrayDeque<Point>()
-
-        for (radius in 1..map.size.coerceAtLeast(map[0].size)) {
-            pointsToCheck.addAll(getPoints(asteroid, radius))
-        }
-
-        while (pointsToCheck.size > 0) {
-            val point = pointsToCheck.pop()
-            if (map[point.y][point.x].isAsteroid()) {
-                if (!hiddenByVisibleAsteroids(visibleAsteroids, asteroid, point)) {
-                    visibleAsteroids.add(point)
-                }
+        for (asteroidToCheck in asteroids) {
+            if (asteroid == asteroidToCheck) {
+                continue
             }
+
+            if (hiddenByAsteroids(asteroids, asteroid, asteroidToCheck)) {
+                continue
+            }
+
+            visibleAsteroids.add(asteroidToCheck)
         }
 
         return visibleAsteroids
     }
 
-    private fun hiddenByVisibleAsteroids(visibleAsteroids: MutableList<Point>, fromPoint: Point, targetPoint: Point): Boolean {
-        for (visibleAsteroid in visibleAsteroids) {
-            if (isOnLine(visibleAsteroid, fromPoint, targetPoint)) {
+    private fun hiddenByAsteroids(asteroids: MutableList<Point>, fromPoint: Point, toPoint: Point): Boolean {
+        for (asteroid in asteroids) {
+            if (fromPoint != asteroid && toPoint != asteroid
+                    && isOnSegment(asteroid, fromPoint, toPoint)) {
                 return true
             }
         }
@@ -84,108 +83,17 @@ class Map(input: List<String>) {
         return false
     }
 
-    private fun getPoints(asteroid: Point, radius: Int): List<Point> {
-        val points = mutableListOf<Point>()
+    fun isOnSegment(point: Point, lineStart: Point, lineEnd: Point): Boolean {
+        val isOnLine = ((lineStart.y - lineEnd.y) * point.x
+                + (lineEnd.x - lineStart.x) * point.y
+                + (lineStart.x * lineEnd.y - lineEnd.x * lineStart.y) == 0)
 
-        val sideSize = 1 + radius * 2
-
-        //up to 12 o'clock
-        var currX = asteroid.x
-        var currY = asteroid.y - radius
-
-        //right top corner
-        var targetX = currX + sideSize / 2
-        var targetY = currY
-
-        for (x in currX until targetX) {
-            if (correctCoordinate(x, currY)) {
-                points.add(Point(x, currY))
-            }
-        }
-        currX = targetX
-        currY = targetY
-
-        //right bottom corner
-        targetX = currX
-        targetY = currY + sideSize - 1
-
-        for (y in currY until targetY) {
-            if (correctCoordinate(currX, y)) {
-                points.add(Point(currX, y))
-            }
-        }
-        currX = targetX
-        currY = targetY
-
-        //left bottom corner
-        targetX = currX - sideSize + 1
-        targetY = currY
-
-        for (x in currX downTo targetX) {
-            if (correctCoordinate(x, currY)) {
-                points.add(Point(x, currY))
-            }
-        }
-        currX = targetX
-        currY = targetY
-
-
-        //left top corner
-        targetX = currX
-        targetY = currY - sideSize + 1
-
-        for (y in currY downTo targetY) {
-            if (correctCoordinate(currX, y)) {
-                points.add(Point(currX, y))
-            }
-        }
-        currX = targetX
-        currY = targetY
-
-
-        //till start point
-        targetX = (currX + sideSize - 1)/2 + 1
-        targetY = currY
-
-        for (x in currX until targetX) {
-            if (correctCoordinate(x, currY)) {
-                points.add(Point(x, currY))
-            }
-        }
-
-        //(1+r*2)
-
-        //1 -> 3 + 3 + 1 + 1 = 8
-        //...
-        //. .
-        //...
-
-        //2 -> 5 + 5 + 3 + 3 = 16
-        //!!!!!
-        //!...!
-        //!. .!
-        //!...!
-        //!!!!!
-
-        return points
-    }
-
-    private fun correctCoordinate(x: Int, y: Int): Boolean {
-        if (x < 0 || y < 0) {
+        if (!isOnLine) {
             return false
         }
 
-        if (x >= map.size || y >= map[0].size) {
-            return false
-        }
-
-        return true
-    }
-
-    fun isOnLine(point: Point, lineStart: Point, lineEnd: Point): Boolean {
-        return (lineStart.y - lineEnd.y) * point.x +
-                (lineEnd.x - lineStart.x) * point.y +
-                (lineStart.x * lineEnd.y - lineEnd.x * lineStart.y) == 0
+        return point.x > min(lineStart.x, lineEnd.x) && point.x < max(lineStart.x, lineEnd.x)
+                && point.y > min(lineStart.y, lineEnd.y) && point.y < max(lineStart.y, lineEnd.y)
     }
 
     fun Char.getFieldValue(): Int {
