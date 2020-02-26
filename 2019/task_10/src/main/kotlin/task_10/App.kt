@@ -112,7 +112,6 @@ class Map(input: List<String>) {
 
 }
 
-
 fun main() {
     val app = App()
     val input = File("input.txt").readLines()
