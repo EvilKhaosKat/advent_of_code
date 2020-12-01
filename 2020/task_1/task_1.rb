@@ -32,6 +32,8 @@ def solve_second
         number_2 = numbers[idx_2]
         number_3 = numbers[idx_3]
 
+        break if number_1 + number_2 > 2020
+
         return number_1 * number_2 * number_3 if number_1 + number_2 + number_3 == 2020
       end
     end
