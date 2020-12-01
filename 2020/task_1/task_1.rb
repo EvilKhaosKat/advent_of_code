@@ -16,7 +16,7 @@ def solve_first
 end
 
 
-# TODO:
+# TODO: that's ugly
 def solve_second
   numbers = []
 
