@@ -1,10 +1,10 @@
-def solve_first
+def solve(filename, check)
   passport = {}
 
   valid_passports = 0
-  File.open('input.txt', 'r').each_line do |line|
+  File.open(filename, 'r').each_line do |line|
     if line.length == 1
-      valid_passports = valid_passports.next if valid_first passport
+      valid_passports = valid_passports.next if check.call passport
       passport = {}
     else
       line.split(' ').each do |pair|
@@ -13,29 +13,17 @@ def solve_first
       end
     end
   end
-  valid_passports = valid_passports.next if valid_first passport
+  valid_passports = valid_passports.next if check.call passport
 
   valid_passports
 end
 
+def solve_first
+  solve('input.txt', method(:valid_first))
+end
+
 def solve_second
-  passport = {}
-
-  valid_passports = 0
-  File.open('input.txt', 'r').each_line do |line|
-    if line.length == 1
-      valid_passports = valid_passports.next if valid_second passport
-      passport = {}
-    else
-      line.split(' ').each do |pair|
-        data = pair.split(':')
-        passport[data[0]] = data[1]
-      end
-    end
-  end
-  valid_passports = valid_passports.next if valid_second passport
-
-  valid_passports
+  solve('input.txt', method(:valid_second))
 end
 
 # @param [Dict] passport
