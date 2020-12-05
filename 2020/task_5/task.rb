@@ -1,3 +1,6 @@
+# frozen_string_literal: true
+
+# @param [string] line
 def get_place(line)
   row_min = 0
   row_max = 127
@@ -38,8 +41,33 @@ def solve_first
   max_id
 end
 
+def solve_second
+  ids = []
+  File.open('input.txt', 'r').each_line do |line|
+    ids.push get_id get_place line
+  end
+
+  ids.sort!
+
+  min_id = ids[0]
+
+  min_idx = 0
+  max_idx = ids.length - 1
+
+  while min_idx < max_idx
+    check_idx = (min_idx + max_idx) / 2
+
+    if ids[check_idx] == check_idx + min_id
+      min_idx = 1 + check_idx
+    else
+      max_idx = check_idx
+    end
+  end
+
+  ids[min_idx] - 1
+end
+
 if $PROGRAM_NAME == __FILE__
   puts solve_first
-  # puts solve_second
+  puts solve_second
 end
-#990 is too high
