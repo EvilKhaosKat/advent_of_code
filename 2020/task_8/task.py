@@ -17,6 +17,7 @@ def solve_second(input):
 
         while not console.loop_detected and not console.terminated:
             console.step()
+
         if console.terminated:
             print(f"fix detected, line {idx} replaced to {console.code[idx].instruction}")
             return console.acc
@@ -24,7 +25,7 @@ def solve_second(input):
         console.reset()
         instruction.fix_corruption()
 
-    return console.acc
+    raise Exception("Console code fix not found")
 
 
 def create_console(input):
@@ -78,6 +79,7 @@ class Console:
 
     def step(self):
         if self.terminated:
+            print("already terminated")
             return
 
         instruction = self.code[self.pointer]
@@ -107,5 +109,5 @@ if __name__ == '__main__':
         for line in file:
             input.append(line)
 
-    print(solve_first(input))
-    print(solve_second(input))
+    print(f"first: {solve_first(input)}")
+    print(f"second: {solve_second(input)}")
